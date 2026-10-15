@@ -1,405 +1,262 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>EventKiosk Pro</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <style>
-    :root {
-      --primary: #ffd700;
-      --accent: #00ffcc;
-      --bg: #0b0c10;
-      --card-bg: rgba(22, 25, 32, 0.96);
-      --green: #2ecc71;
-      --red: #e63946;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    html, body { width: 100vw; height: 100vh; background: var(--bg); color: #fff; overflow: hidden; }
-    #kioskApp { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 8px 12px 10px; gap: 8px; }
-    header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 6px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
-    .event-title { font-size: 1.25rem; font-weight: 800; color: var(--primary); max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .stats-panel { display: flex; gap: 6px; font-size: 0.9rem; font-weight: 700; }
-    .badge { padding: 3px 10px; border-radius: 16px; }
-    .badge-arrived { background: rgba(46,204,113,0.18); color: var(--green); border: 1px solid var(--green); }
-    .badge-pending { background: rgba(230,57,70,0.18); color: var(--red); border: 1px solid var(--red); }
-    .badge-total { background: rgba(255,255,255,0.1); color: #ddd; }
-    .kiosk-body { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; }
-    .search-section { display: flex; flex-direction: column; height: 100%; min-height: 0; gap: 6px; }
-    .search-input { flex: 0 0 auto; width: 100%; padding: 8px 12px; font-size: 1.15rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--primary); background: #121419; color: #fff; outline: none; }
-    .result-qr-row { flex: 0 0 120px; height: 120px; display: flex; gap: 8px; }
-    .result-card { flex: 1; background: var(--card-bg); border-radius: 10px; padding: 8px 12px; border: 1px solid rgba(255,215,0,0.35); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-    .res-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .res-table { font-size: 1.65rem; font-weight: 900; color: var(--primary); margin: 1px 0; }
-    .res-zone { font-size: 0.85rem; color: var(--accent); }
-    .btn-checkin { margin-top: 4px; padding: 6px; font-size: 0.85rem; font-weight: 800; background: var(--green); color: #000; border: none; border-radius: 6px; cursor: pointer; display: none; }
-    .btn-checkin:disabled { background: #444 !important; color: #aaa; }
-    .qr-card-left { flex: 0 0 110px; background: var(--card-bg); border-radius: 10px; padding: 4px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #qrcode { background: #fff; padding: 3px; border-radius: 6px; }
-    .qr-mini-label { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 2px; }
-    /* Lista orizontală de nume asemănătoare (cuburi) */
-    .matches-horizontal {
-      flex: 0 0 auto;
-      display: none;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 6px;
-      padding: 4px 0;
-      max-height: 70px;
-    }
-    .match-cube {
-      flex: 0 0 auto;
-      min-width: 140px;
-      max-width: 180px;
-      background: #1c2029;
-      border: 1px solid #3a4150;
-      border-radius: 8px;
-      padding: 6px 8px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .match-cube:hover, .match-cube.active { background: rgba(255,215,0,0.25); border-color: var(--primary); }
-    .match-cube .st { font-size: 0.7rem; opacity: 0.75; display: block; }
-    .keyboard { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 0; }
-    .kb-row { display: flex; gap: 4px; width: 100%; flex: 1; }
-    .key-btn { flex: 1; min-height: 36px; font-size: 1.05rem; font-weight: 800; border: none; border-radius: 6px; background: #232732; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #111; }
-    .key-btn:active { background: var(--primary); color: #000; transform: translateY(1px); }
-    .key-btn.wide { flex: 2.2; background: #343a48; font-size: 0.85rem; }
-    .key-btn.back { background: #b71c1c; flex: 1.5; font-size: 0.85rem; }
-    .right-section { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
-    .video-card, .map-card { flex: 1 1 50%; min-height: 0; border-radius: 10px; position: relative; overflow: hidden; background: #000; }
-    .video-card { border: 1px solid rgba(255,215,0,0.35); }
-    .map-card { background: #14171f; border: 1px solid rgba(255,255,255,0.1); }
-    .video-header-bar { position: absolute; top: 0; left: 0; width: 100%; z-index: 5; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); padding: 4px 8px; display: flex; justify-content: space-between; align-items: center; }
-    .video-title-tag { font-size: 0.7rem; font-weight: 800; color: var(--primary); }
-    .vol-btn { background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 5px; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
-    .vol-btn.active-sound { background: var(--green); color: #000; }
-    #dedicatedVideo, #dedicatedImage { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-    #dedicatedImage { object-fit: contain; display: none; }
-    #salaImg { width: 100%; height: 100%; object-fit: contain; display: none; }
-    .no-map-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #777; font-size: 0.8rem; text-align: center; padding: 10px; }
-    .map-badge-tag { position: absolute; top: 4px; left: 6px; background: rgba(0,0,0,0.7); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; z-index: 2; }
-    .fs-btn { position: fixed; top: 6px; right: 6px; z-index: 30; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; padding: 3px 7px; font-size: 0.7rem; cursor: pointer; opacity: 0.75; }
-    .fs-btn:hover { opacity: 1; }
-    .admin-bar { position: fixed; bottom: 4px; left: 10px; z-index: 10; display: flex; gap: 5px; opacity: 0.4; transition: opacity 0.2s; }
-    .admin-bar:hover { opacity: 1; }
-    .btn-admin { background: #252834; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; font-weight: 700; }
-    #adminModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
-    .admin-content { background: #181a20; border: 1px solid var(--primary); border-radius: 12px; padding: 16px; width: 90%; max-width: 600px; max-height: 88vh; overflow-y: auto; }
-    .form-group { margin-bottom: 8px; }
-    .form-group label { display: block; font-size: 0.78rem; color: #bbb; margin-bottom: 2px; font-weight: 700; }
-    .form-group input, .form-group textarea { width: 100%; padding: 6px 8px; border-radius: 6px; background: #0d0f13; border: 1px solid #333; color: #fff; font-size: 0.85rem; }
-    .upload-box { background: #222632; border: 1px dashed #555; padding: 6px; border-radius: 6px; margin-top: 2px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EventKiosk</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--gold:#ffd700;--cyan:#00ffcc;--bg:#0a0e14;--card:#121820;--green:#2ecc71;--red:#e74c3c;}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+html,body{width:100vw;height:100vh;background:var(--bg);color:#fff;overflow:hidden;}
+#app{width:100%;height:100%;display:flex;flex-direction:column;padding:8px 12px 10px;gap:8px;}
+header{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.08);}
+.title{font-size:1.35rem;font-weight:800;color:#ff8c00;letter-spacing:.5px;}
+.stats{display:flex;gap:10px;font-weight:700;font-size:.95rem;}
+.badge{padding:4px 12px;border-radius:20px;}
+.b-arr{background:rgba(46,204,113,.2);color:var(--green);border:1px solid var(--green);}
+.b-tot{background:rgba(255,255,255,.1);color:#ddd;}
+.body{flex:1;display:grid;grid-template-columns:1.35fr 1fr;gap:12px;min-height:0;}
+.left{display:flex;flex-direction:column;gap:8px;min-height:0;}
+.search{width:100%;padding:10px 14px;font-size:1.2rem;font-weight:700;border-radius:8px;border:2px solid var(--gold);background:#0d1117;color:#fff;outline:none;}
+.result{background:var(--card);border-radius:12px;padding:12px 16px;border:1px solid rgba(255,215,0,.3);min-height:110px;display:flex;flex-direction:column;justify-content:center;}
+.r-name{font-size:1.8rem;font-weight:800;text-align:center;}
+.r-table{font-size:2rem;font-weight:900;color:var(--gold);text-align:center;margin:4px 0;}
+.r-zone{font-size:1rem;color:var(--cyan);text-align:center;}
+.matches{display:none;flex-wrap:wrap;gap:6px;max-height:80px;overflow-y:auto;}
+.cube{background:#1a2230;border:1px solid #3a4555;border-radius:20px;padding:6px 12px;font-size:.85rem;cursor:pointer;white-space:nowrap;}
+.cube:hover,.cube.on{background:rgba(255,215,0,.25);border-color:var(--gold);}
+.kb{display:flex;flex-direction:column;gap:5px;margin-top:auto;}
+.row{display:flex;gap:5px;}
+.key{flex:1;height:48px;font-size:1.15rem;font-weight:800;border:none;border-radius:8px;background:#1e3a5f;color:#fff;cursor:pointer;}
+.key:active{background:var(--gold);color:#000;}
+.key.w{flex:2.2;background:#2a4a70;}
+.key.del{background:#8b0000;}
+.right{display:flex;flex-direction:column;gap:8px;min-height:0;}
+.vid,.map{flex:1;border-radius:12px;overflow:hidden;position:relative;background:#000;min-height:0;}
+.vid{border:1px solid rgba(255,215,0,.35);}
+.map{border:1px solid rgba(255,255,255,.1);background:#111;}
+.vbar{position:absolute;top:0;left:0;right:0;padding:6px 10px;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);display:flex;justify-content:space-between;z-index:2;}
+.vtag{font-size:.75rem;font-weight:800;color:var(--gold);}
+.vol{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:2px 8px;font-size:.75rem;cursor:pointer;}
+.vol.on{background:var(--green);color:#000;}
+#v,#imgv{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+#imgv{display:none;object-fit:contain;}
+#mapimg{width:100%;height:100%;object-fit:contain;display:none;}
+.nomap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:.85rem;text-align:center;padding:10px;}
+.mtag{position:absolute;top:6px;left:8px;background:rgba(0,0,0,.7);color:var(--cyan);padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:800;z-index:2;}
+.fs{position:fixed;top:8px;right:8px;z-index:40;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:4px 8px;font-size:.75rem;cursor:pointer;opacity:.8;}
+.fs:hover{opacity:1;}
+.admin{position:fixed;bottom:6px;left:10px;z-index:30;opacity:.45;transition:.2s;}
+.admin:hover{opacity:1;}
+.abtn{background:#252a35;color:#fff;border:1px solid #444;padding:6px 12px;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:700;}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;align-items:center;justify-content:center;}
+.box{background:#161a22;border:1px solid var(--gold);border-radius:14px;padding:18px;width:92%;max-width:640px;max-height:90vh;overflow-y:auto;}
+.fg{margin-bottom:10px;}
+.fg label{display:block;font-size:.8rem;color:#aaa;margin-bottom:3px;font-weight:700;}
+.fg input,.fg textarea{width:100%;padding:8px 10px;border-radius:6px;background:#0c0e12;border:1px solid #333;color:#fff;font-size:.9rem;}
+.qrbox{position:absolute;bottom:8px;right:8px;background:#fff;padding:4px;border-radius:8px;z-index:5;}
+.qrbox canvas,.qrbox img{display:block;}
+</style>
 </head>
 <body>
-  <div id="kioskApp">
-    <header>
-      <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
-      <div class="stats-panel">
-        <div class="badge badge-arrived" id="statArrived">SOSIȚI: 0</div>
-        <div class="badge badge-pending" id="statRemaining">RĂMAȘI: 0</div>
-        <div class="badge badge-total" id="statTotal">TOTAL: 0</div>
+<div id="app">
+  <header>
+    <div class="title" id="title">BOTEZ MORGAN - 18 OCTOMBRIE</div>
+    <div class="stats">
+      <div class="badge b-arr" id="arr">SOSIȚI: 0</div>
+      <div class="badge b-tot" id="tot">TOTAL: 0</div>
+    </div>
+  </header>
+  <div class="body">
+    <div class="left">
+      <input id="q" class="search" placeholder="Tastați numele..." autocomplete="off">
+      <div class="result">
+        <div class="r-name" id="rn">Tastați numele</div>
+        <div class="r-table" id="rt">MASA: ---</div>
+        <div class="r-zone" id="rz"></div>
+        <button id="chk" onclick="check()" style="display:none;margin-top:8px;padding:8px;background:var(--green);border:none;border-radius:8px;font-weight:800;cursor:pointer;">Sosir ✓</button>
       </div>
-    </header>
-    <div class="kiosk-body">
-      <div class="search-section">
-        <input type="text" id="searchInput" class="search-input" placeholder="Tastați numele..." autocomplete="off">
-        <div class="result-qr-row">
-          <div class="result-card">
-            <div class="res-name" id="resName">Tastați numele pe tastatură</div>
-            <div class="res-table" id="resTable">MASA: ---</div>
-            <div class="res-zone" id="resZone">Zona: ---</div>
-            <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA</button>
-          </div>
-          <div class="qr-card-left">
-            <div id="qrcode"></div>
-            <div class="qr-mini-label">SCAN</div>
-          </div>
+      <div class="matches" id="matches"></div>
+      <div class="kb">
+        <div class="row">
+          <button class="key" onclick="k('Q')">Q</button><button class="key" onclick="k('W')">W</button><button class="key" onclick="k('E')">E</button><button class="key" onclick="k('R')">R</button><button class="key" onclick="k('T')">T</button><button class="key" onclick="k('Y')">Y</button><button class="key" onclick="k('U')">U</button><button class="key" onclick="k('I')">I</button><button class="key" onclick="k('O')">O</button><button class="key" onclick="k('P')">P</button><button class="key" onclick="k('Ă')">Ă</button><button class="key" onclick="k('Î')">Î</button>
         </div>
-        <div class="matches-horizontal" id="matchesList"></div>
-        <div class="keyboard">
-          <div class="kb-row">
-            <button class="key-btn" onclick="pressKey('A')">A</button><button class="key-btn" onclick="pressKey('B')">B</button><button class="key-btn" onclick="pressKey('C')">C</button><button class="key-btn" onclick="pressKey('D')">D</button><button class="key-btn" onclick="pressKey('E')">E</button><button class="key-btn" onclick="pressKey('F')">F</button><button class="key-btn" onclick="pressKey('G')">G</button><button class="key-btn" onclick="pressKey('H')">H</button><button class="key-btn" onclick="pressKey('I')">I</button>
-          </div>
-          <div class="kb-row">
-            <button class="key-btn" onclick="pressKey('J')">J</button><button class="key-btn" onclick="pressKey('K')">K</button><button class="key-btn" onclick="pressKey('L')">L</button><button class="key-btn" onclick="pressKey('M')">M</button><button class="key-btn" onclick="pressKey('N')">N</button><button class="key-btn" onclick="pressKey('O')">O</button><button class="key-btn" onclick="pressKey('P')">P</button><button class="key-btn" onclick="pressKey('Q')">Q</button><button class="key-btn" onclick="pressKey('R')">R</button>
-          </div>
-          <div class="kb-row">
-            <button class="key-btn" onclick="pressKey('S')">S</button><button class="key-btn" onclick="pressKey('T')">T</button><button class="key-btn" onclick="pressKey('U')">U</button><button class="key-btn" onclick="pressKey('V')">V</button><button class="key-btn" onclick="pressKey('W')">W</button><button class="key-btn" onclick="pressKey('X')">X</button><button class="key-btn" onclick="pressKey('Y')">Y</button><button class="key-btn" onclick="pressKey('Z')">Z</button>
-          </div>
-          <div class="kb-row">
-            <button class="key-btn wide" onclick="pressKey(' ')">SPAȚIU</button>
-            <button class="key-btn back" onclick="backspaceKey()">⌫</button>
-            <button class="key-btn wide" onclick="clearSearch()">GOLIȚI</button>
-          </div>
+        <div class="row">
+          <button class="key" onclick="k('A')">A</button><button class="key" onclick="k('S')">S</button><button class="key" onclick="k('D')">D</button><button class="key" onclick="k('F')">F</button><button class="key" onclick="k('G')">G</button><button class="key" onclick="k('H')">H</button><button class="key" onclick="k('J')">J</button><button class="key" onclick="k('K')">K</button><button class="key" onclick="k('L')">L</button><button class="key" onclick="k('Ș')">Ș</button><button class="key" onclick="k('Ț')">Ț</button><button class="key" onclick="k('Â')">Â</button>
         </div>
-      </div>
-      <div class="right-section">
-        <div class="video-card">
-          <div class="video-header-bar">
-            <div class="video-title-tag">MOMENTE</div>
-            <button class="vol-btn" id="btnToggleAudio" onclick="toggleVideoAudio()">🔇</button>
-          </div>
-          <video id="dedicatedVideo" autoplay loop muted playsinline></video>
-          <img id="dedicatedImage" alt="">
+        <div class="row">
+          <button class="key w" onclick="clearQ()">Golește</button><button class="key" onclick="k('Z')">Z</button><button class="key" onclick="k('X')">X</button><button class="key" onclick="k('C')">C</button><button class="key" onclick="k('V')">V</button><button class="key" onclick="k('B')">B</button><button class="key" onclick="k('N')">N</button><button class="key" onclick="k('M')">M</button><button class="key del" onclick="bs()">⌫ Șterge</button>
         </div>
-        <div class="map-card">
-          <div class="map-badge-tag">🗺 SCHIȚĂ</div>
-          <img id="salaImg" src="" alt="">
-          <div class="no-map-msg" id="noMapMsg">Încarcă schița din Panou Control</div>
+        <div class="row">
+          <button class="key w" onclick="k(' ')">SPAȚIU</button>
         </div>
       </div>
     </div>
-  </div>
-  <button class="fs-btn" onclick="toggleFullScreen()">⛶</button>
-  <div class="admin-bar">
-    <button class="btn-admin" onclick="openAdminModal()">⚙ Panou</button>
-    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Full</button>
-  </div>
-  <div id="adminModal">
-    <div class="admin-content">
-      <h2 style="color:var(--primary); margin-bottom:10px; font-size:1.15rem;">Panou Control</h2>
-      <div class="form-group"><label>Titlu:</label><input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ"></div>
-      <div class="form-group">
-        <label>Video / Poză sus:</label>
-        <div class="upload-box">
-          <input type="file" id="filePlayerInput" accept="video/*,image/*" onchange="handlePlayerUpload(event)">
-          <input type="text" id="cfgPlayerMedia" value="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4" style="margin-top:4px;">
-        </div>
+    <div class="right">
+      <div class="vid">
+        <div class="vbar"><span class="vtag">MOMENTE SPECIALE</span><button class="vol" id="volbtn" onclick="toggleSound()">🔇</button></div>
+        <video id="v" autoplay loop muted playsinline></video>
+        <img id="imgv" alt="">
       </div>
-      <div class="form-group">
-        <label>Schiță sală:</label>
-        <div class="upload-box">
-          <input type="file" id="fileSalaInput" accept="image/*" onchange="handleSalaUpload(event)">
-          <input type="text" id="cfgSalaImg" placeholder="sau link" style="margin-top:4px;">
-        </div>
-      </div>
-      <div class="form-group"><label>Link QR:</label><input type="text" id="cfgCloudLink" value="https://drive.google.com"></div>
-      <div class="form-group"><label>Listă invitați (Nume | Masa | Zona):</label><textarea id="cfgGuestList" rows="5">Popescu Ion | Masa 1 | Lângă ring
-Popescu Elena | Masa 1 | Lângă ring
-Ionescu Andrei | Masa 3 | Lângă bar
-Radu Maria | Masa 2 | Scenă
-Stan George | Masa 4 | Geamuri</textarea></div>
-      <div style="display:flex; justify-content:space-between; gap:8px; margin-top:12px; flex-wrap:wrap;">
-        <button class="btn-admin" style="background:var(--green); color:#000; padding:8px 14px;" onclick="saveConfig()">✔ Salvează</button>
-        <button class="btn-admin" style="background:#c0392b; padding:8px 14px;" onclick="resetEvent()">🔄 Reset Eveniment</button>
-        <button class="btn-admin" style="background:#555; padding:8px 14px;" onclick="closeAdminModal()">Închide</button>
+      <div class="map">
+        <div class="mtag">SCHIȚĂ SALĂ RESTAURANT</div>
+        <img id="mapimg" alt="">
+        <div class="nomap" id="nomap">Încarcă schița din Panou Control</div>
       </div>
     </div>
   </div>
-  <script>
-    let guests = [];
-    let currentSelectedIndex = -1;
-    let autoResetTimer = null;
-    let activePlayerMedia = "";
-    let activeSalaImage = "";
-    function cleanText(str) {
-      if (!str) return "";
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ș|ş/gi, "s").replace(/ț|ţ/gi, "t").toUpperCase().trim();
-    }
-    window.onload = function() {
-      document.getElementById('searchInput').addEventListener('input', function(e) {
-        searchGuest(e.target.value);
-        triggerAutoReset();
-      });
-      loadSavedConfig();
-    };
-    function loadSavedConfig() {
-      const savedCfg = localStorage.getItem('kiosk_config_v6');
-      const savedStatus = localStorage.getItem('kiosk_status_v6');
-      let statusMap = {};
-      if (savedStatus) try { statusMap = JSON.parse(savedStatus); } catch(e) {}
-      if (savedCfg) {
-        const cfg = JSON.parse(savedCfg);
-        document.getElementById('dispEventTitle').innerText = cfg.title;
-        document.getElementById('cfgTitle').value = cfg.title;
-        document.getElementById('cfgCloudLink').value = cfg.cloudLink || 'https://drive.google.com';
-        document.getElementById('cfgGuestList').value = cfg.guestRaw;
-        activePlayerMedia = cfg.playerMedia || "https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4";
-        activeSalaImage = cfg.salaImg || "";
-        document.getElementById('cfgPlayerMedia').value = activePlayerMedia.startsWith('data:') ? '[încărcat]' : activePlayerMedia;
-        document.getElementById('cfgSalaImg').value = activeSalaImage.startsWith('data:') ? '[încărcat]' : activeSalaImage;
-        applyPlayerMedia(activePlayerMedia);
-        applySalaImage(activeSalaImage);
-        parseGuests(cfg.guestRaw, statusMap);
-        renderQRCode(cfg.cloudLink);
-      } else {
-        activePlayerMedia = document.getElementById('cfgPlayerMedia').value;
-        parseGuests(document.getElementById('cfgGuestList').value, {});
-        applyPlayerMedia(activePlayerMedia);
-        applySalaImage("");
-        renderQRCode(document.getElementById('cfgCloudLink').value);
-      }
-      updateStats();
-    }
-    function handlePlayerUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.type.startsWith('video')) {
-        activePlayerMedia = URL.createObjectURL(file);
-        applyPlayerMedia(activePlayerMedia);
-      } else {
-        const reader = new FileReader();
-        reader.onload = e => { activePlayerMedia = e.target.result; applyPlayerMedia(activePlayerMedia); };
-        reader.readAsDataURL(file);
-      }
-    }
-    function applyPlayerMedia(src) {
-      const video = document.getElementById('dedicatedVideo');
-      const img = document.getElementById('dedicatedImage');
-      if (!src) return;
-      const isImg = src.startsWith('data:image') || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
-      if (isImg) {
-        video.style.display = 'none'; video.pause();
-        img.style.display = 'block'; img.src = src;
-      } else {
-        img.style.display = 'none';
-        video.style.display = 'block'; video.src = src; video.play().catch(()=>{});
-      }
-    }
-    function toggleVideoAudio() {
-      const video = document.getElementById('dedicatedVideo');
-      const btn = document.getElementById('btnToggleAudio');
-      if (video.style.display === 'none') return;
-      video.muted = !video.muted;
-      if (video.muted) { btn.innerText = "🔇"; btn.classList.remove("active-sound"); }
-      else { btn.innerText = "🔊"; btn.classList.add("active-sound"); }
-    }
-    function handleSalaUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => { activeSalaImage = e.target.result; applySalaImage(activeSalaImage); };
-      reader.readAsDataURL(file);
-    }
-    function applySalaImage(src) {
-      const img = document.getElementById('salaImg');
-      const msg = document.getElementById('noMapMsg');
-      if (src && src.trim() && src !== '[încărcat]') {
-        img.src = src; img.style.display = 'block'; msg.style.display = 'none';
-      } else { img.style.display = 'none'; msg.style.display = 'flex'; }
-    }
-    function saveConfig() {
-      const manualPlayer = document.getElementById('cfgPlayerMedia').value.trim();
-      const manualSala = document.getElementById('cfgSalaImg').value.trim();
-      if (manualPlayer && manualPlayer !== '[încărcat]') activePlayerMedia = manualPlayer;
-      if (manualSala && manualSala !== '[încărcat]') activeSalaImage = manualSala;
-      const cfg = {
-        title: document.getElementById('cfgTitle').value,
-        playerMedia: activePlayerMedia,
-        salaImg: activeSalaImage,
-        cloudLink: document.getElementById('cfgCloudLink').value,
-        guestRaw: document.getElementById('cfgGuestList').value
-      };
-      try { localStorage.setItem('kiosk_config_v6', JSON.stringify(cfg)); } catch(e) {}
-      applyPlayerMedia(activePlayerMedia);
-      applySalaImage(activeSalaImage);
-      parseGuests(cfg.guestRaw, JSON.parse(localStorage.getItem('kiosk_status_v6') || '{}'));
-      renderQRCode(cfg.cloudLink);
-      closeAdminModal();
-      clearSearch();
-    }
-    function resetEvent() {
-      if (!confirm("Ștergi toate check-in-urile? Lista de invitați rămâne.")) return;
-      localStorage.removeItem('kiosk_status_v6');
-      guests.forEach(g => g.arrived = false);
-      updateStats();
-      clearSearch();
-      alert("Eveniment resetat. Toți invitații sunt din nou în așteptare.");
-    }
-    function parseGuests(rawText, statusMap) {
-      guests = [];
-      if (!rawText) return;
-      rawText.split(/\r?\n/).forEach(line => {
-        line = line.trim(); if (!line) return;
-        const parts = line.split('|').map(p => p.trim());
-        if (parts[0]) guests.push({ name: parts[0], table: parts[1] || '—', zone: parts[2] || 'Sală', arrived: statusMap[parts[0]] === true });
-      });
-      updateStats();
-    }
-    function saveStatus() {
-      const m = {}; guests.forEach(g => m[g.name] = g.arrived);
-      try { localStorage.setItem('kiosk_status_v6', JSON.stringify(m)); } catch(e) {}
-    }
-    function renderQRCode(url) {
-      const c = document.getElementById('qrcode'); c.innerHTML = '';
-      if (typeof QRCode !== 'undefined') new QRCode(c, { text: url || 'https://example.com', width: 76, height: 76, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M });
-    }
-    function pressKey(ch) { const i = document.getElementById('searchInput'); i.value += ch; searchGuest(i.value); triggerAutoReset(); }
-    function backspaceKey() { const i = document.getElementById('searchInput'); i.value = i.value.slice(0,-1); searchGuest(i.value); triggerAutoReset(); }
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      currentSelectedIndex = -1;
-      document.getElementById('resName').innerText = 'Tastați numele pe tastatură';
-      document.getElementById('resTable').innerText = 'MASA: ---';
-      document.getElementById('resZone').innerText = 'Zona: ---';
-      document.getElementById('btnCheckIn').style.display = 'none';
-      const list = document.getElementById('matchesList');
-      list.style.display = 'none'; list.innerHTML = '';
-    }
-    function searchGuest(query) {
-      const q = cleanText(query);
-      const list = document.getElementById('matchesList');
-      list.innerHTML = ''; list.style.display = 'none';
-      if (!q) { clearSearch(); return; }
-      const matches = guests.map((g,idx)=>({...g,idx})).filter(g => cleanText(g.name).includes(q));
-      if (matches.length === 0) {
-        document.getElementById('resName').innerText = 'Nu s-a găsit...';
-        document.getElementById('resTable').innerText = 'MASA: ---';
-        document.getElementById('resZone').innerText = 'Verificați';
-        document.getElementById('btnCheckIn').style.display = 'none';
-        return;
-      }
-      if (matches.length > 1) {
-        list.style.display = 'flex';
-        matches.forEach(m => {
-          const d = document.createElement('div');
-          d.className = 'match-cube' + (m.idx === currentSelectedIndex ? ' active' : '');
-          d.innerHTML = m.name + '<span class="st">' + (m.arrived ? '✓' : '—') + '</span>';
-          d.onclick = () => selectGuest(m.idx);
-          list.appendChild(d);
-        });
-      }
-      selectGuest(matches[0].idx);
-    }
-    function selectGuest(idx) {
-      currentSelectedIndex = idx;
-      const g = guests[idx];
-      document.getElementById('resName').innerText = g.name;
-      document.getElementById('resTable').innerText = g.table;
-      document.getElementById('resZone').innerText = 'Zona: ' + g.zone;
-      const btn = document.getElementById('btnCheckIn');
-      btn.style.display = 'block';
-      if (g.arrived) { btn.innerText = '✓ DEJA SOSIT'; btn.disabled = true; }
-      else { btn.innerText = '✔ CONFIRMĂ PREZENȚA'; btn.disabled = false; }
-    }
-    function confirmCheckIn() {
-      if (currentSelectedIndex < 0) return;
-      guests[currentSelectedIndex].arrived = true;
-      saveStatus(); updateStats();
-      const btn = document.getElementById('btnCheckIn');
-      btn.innerText = '✓ BINE AȚI VENIT!'; btn.disabled = true;
-      setTimeout(clearSearch, 2800);
-    }
-    function updateStats() {
-      const arr = guests.filter(g => g.arrived).length;
-      const tot = guests.length;
-      document.getElementById('statArrived').innerText = `SOSIȚI: ${arr}`;
-      document.getElementById('statRemaining').innerText = `RĂMAȘI: ${Math.max(0, tot - arr)}`;
-      document.getElementById('statTotal').innerText = `TOTAL: ${tot}`;
-    }
-    function triggerAutoReset() { if (autoResetTimer) clearTimeout(autoResetTimer); autoResetTimer = setTimeout(clearSearch, 14000); }
-    function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
-    function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
-      else if (document.exitFullscreen) document.exitFullscreen();
-    }
-  </script>
+</div>
+<button class="fs" onclick="fs()">⛶</button>
+<div class="admin"><button class="abtn" onclick="openM()">⚙ Panou Control</button></div>
+<div class="qrbox" id="qr"></div>
+<div id="modal">
+  <div class="box">
+    <h2 style="color:var(--gold);margin-bottom:12px;">Panou Control</h2>
+    <div class="fg"><label>Nume eveniment</label><input id="cfgT" value="BOTEZ MORGAN - 18 OCTOMBRIE"></div>
+    <div class="fg">
+      <label>Upload Video sau Poză (sau URL opțional)</label>
+      <input type="file" id="fileV" accept="video/*,image/*" onchange="upVideo(event)" style="margin-bottom:6px;">
+      <input id="cfgV" placeholder="sau URL video/poză">
+    </div>
+    <div class="fg">
+      <label>Upload Schiță sală (sau URL opțional)</label>
+      <input type="file" id="fileM" accept="image/*" onchange="upMap(event)" style="margin-bottom:6px;">
+      <input id="cfgM" placeholder="sau URL schiță">
+    </div>
+    <div class="fg"><label>Link QR (lista pe telefon)</label><input id="cfgQ" value="https://drive.google.com"></div>
+    <div class="fg"><label>Listă invitați (Nume | Masa | Zona) — unul pe linie</label><textarea id="cfgL" rows="6">Marioara Marian | Masa 3 | Lângă scenă
+Galatanu Marinela | Masa 1 | Intrare
+Botorogeanu Marian | Masa 2 | Geam
+Marioara Florina | Masa 3 | Lângă scenă</textarea></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+      <button class="abtn" style="background:var(--green);color:#000;" onclick="save()">✔ Salvează</button>
+      <button class="abtn" style="background:#c0392b;" onclick="resetEv()">🔄 Reset Eveniment</button>
+      <button class="abtn" style="background:#555;" onclick="closeM()">Închide</button>
+    </div>
+  </div>
+</div>
+<script>
+let G=[], cur=-1, timer=null, media="", mapu="";
+function clean(s){return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ș|ş/gi,"s").replace(/ț|ţ/gi,"t").toUpperCase().trim();}
+onload=()=>{document.getElementById("q").oninput=e=>{search(e.target.value);arm();};load();};
+function load(){
+  const c=localStorage.getItem("k7");
+  const st=JSON.parse(localStorage.getItem("k7s")||"{}");
+  if(c){const j=JSON.parse(c);
+    document.getElementById("title").textContent=j.t;
+    document.getElementById("cfgT").value=j.t;
+    document.getElementById("cfgV").value=j.v||"";
+    document.getElementById("cfgM").value=j.m||"";
+    document.getElementById("cfgQ").value=j.q||"";
+    document.getElementById("cfgL").value=j.l;
+    media=j.v||""; mapu=j.m||"";
+    setMedia(media); setMap(mapu); parse(j.l,st); qr(j.q);
+  }else{parse(document.getElementById("cfgL").value,{}); setMedia(document.getElementById("cfgV").value); qr(document.getElementById("cfgQ").value);}
+  stats();
+}
+function setMedia(u){
+  const v=document.getElementById("v"), i=document.getElementById("imgv");
+  if(!u){v.style.display="none";i.style.display="none";return;}
+  const isImg = u.startsWith("data:image") || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(u);
+  if(isImg){v.style.display="none";v.pause();i.style.display="block";i.src=u;}
+  else{i.style.display="none";v.style.display="block";v.src=u;v.play().catch(()=>{});}
+}
+function toggleSound(){
+  const v=document.getElementById("v"), b=document.getElementById("volbtn");
+  if(v.style.display==="none")return;
+  v.muted=!v.muted;
+  b.textContent=v.muted?"🔇":"🔊";
+  b.classList.toggle("on",!v.muted);
+}
+function setMap(u){
+  const i=document.getElementById("mapimg"), n=document.getElementById("nomap");
+  if(u){i.src=u;i.style.display="block";n.style.display="none";}else{i.style.display="none";n.style.display="flex";}
+}
+function upVideo(e){
+  const f=e.target.files[0]; if(!f)return;
+  if(f.type.startsWith("video")){
+    media=URL.createObjectURL(f); setMedia(media);
+  }else{
+    const r=new FileReader(); r.onload=ev=>{media=ev.target.result; setMedia(media);}; r.readAsDataURL(f);
+  }
+}
+function upMap(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=ev=>{mapu=ev.target.result; setMap(mapu);}; r.readAsDataURL(f);
+}
+function save(){
+  const manualV=document.getElementById("cfgV").value.trim();
+  const manualM=document.getElementById("cfgM").value.trim();
+  if(manualV) media=manualV;
+  if(manualM) mapu=manualM;
+  const o={t:document.getElementById("cfgT").value,v:media,m:mapu,q:document.getElementById("cfgQ").value.trim(),l:document.getElementById("cfgL").value};
+  try{localStorage.setItem("k7",JSON.stringify(o));}catch(e){console.warn("storage",e);}
+  document.getElementById("title").textContent=o.t;
+  setMedia(media); setMap(mapu); parse(o.l,JSON.parse(localStorage.getItem("k7s")||"{}")); qr(o.q);
+  closeM(); clearQ();
+}
+function resetEv(){
+  if(!confirm("Resetezi toate check-in-urile? Lista rămâne."))return;
+  localStorage.removeItem("k7s");
+  G.forEach(g=>g.a=false); stats(); clearQ();
+  alert("Resetat. Toți invitații sunt din nou în așteptare.");
+}
+function parse(t,st){
+  G=[]; (t||"").split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return; const p=l.split("|").map(x=>x.trim()); if(p[0])G.push({n:p[0],m:p[1]||"—",z:p[2]||"",a:st[p[0]]===true});});
+  stats();
+}
+function stats(){
+  const a=G.filter(g=>g.a).length;
+  document.getElementById("arr").textContent="SOSIȚI: "+a;
+  document.getElementById("tot").textContent="TOTAL: "+G.length;
+}
+function qr(u){
+  const c=document.getElementById("qr"); c.innerHTML="";
+  if(typeof QRCode!=="undefined" && u) new QRCode(c,{text:u,width:90,height:90,colorDark:"#000",colorLight:"#fff"});
+}
+function k(ch){const i=document.getElementById("q");i.value+=ch;search(i.value);arm();}
+function bs(){const i=document.getElementById("q");i.value=i.value.slice(0,-1);search(i.value);arm();}
+function clearQ(){
+  document.getElementById("q").value=""; cur=-1;
+  document.getElementById("rn").textContent="Tastați numele";
+  document.getElementById("rt").textContent="MASA: ---";
+  document.getElementById("rz").textContent="";
+  document.getElementById("chk").style.display="none";
+  document.getElementById("matches").style.display="none";
+  document.getElementById("matches").innerHTML="";
+}
+function search(q){
+  const c=clean(q); const box=document.getElementById("matches");
+  box.innerHTML=""; box.style.display="none";
+  if(!c){clearQ();return;}
+  const ms=G.map((g,i)=>({...g,i})).filter(g=>clean(g.n).includes(c));
+  if(!ms.length){document.getElementById("rn").textContent="Nu s-a găsit";document.getElementById("rt").textContent="MASA: ---";document.getElementById("chk").style.display="none";return;}
+  if(ms.length>1){
+    box.style.display="flex";
+    ms.forEach(m=>{const d=document.createElement("div");d.className="cube"+(m.i===cur?" on":"");d.textContent=m.n;d.onclick=()=>sel(m.i);box.appendChild(d);});
+  }
+  sel(ms[0].i);
+}
+function sel(i){
+  cur=i; const g=G[i];
+  document.getElementById("rn").textContent=g.n;
+  document.getElementById("rt").textContent=g.m;
+  document.getElementById("rz").textContent=g.z?"✓ "+g.z:"";
+  const b=document.getElementById("chk"); b.style.display="block";
+  if(g.a){b.textContent="✓ Deja sosit";b.disabled=true;b.style.background="#555";}
+  else{b.textContent="Sosir ✓";b.disabled=false;b.style.background="var(--green)";}
+}
+function check(){
+  if(cur<0)return; G[cur].a=true;
+  const m={}; G.forEach(g=>m[g.n]=g.a); localStorage.setItem("k7s",JSON.stringify(m));
+  stats(); const b=document.getElementById("chk"); b.textContent="✓ Bine ați venit!"; b.disabled=true;
+  setTimeout(clearQ,2500);
+}
+function arm(){if(timer)clearTimeout(timer);timer=setTimeout(clearQ,15000);}
+function openM(){document.getElementById("modal").style.display="flex";}
+function closeM(){document.getElementById("modal").style.display="none";}
+function fs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+</script>
 </body>
 </html>
