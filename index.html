@@ -58,31 +58,9 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 45%;
+      max-width: 50%;
     }
-    .stats-panel { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 700; }
-    
-    /* BUTON FULLSCREEN ÎNAINTE DE SOSIȚI */
-    .btn-fs-top {
-      background: rgba(255, 215, 0, 0.15);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-    .btn-fs-top:active {
-      background: var(--primary);
-      color: #000;
-      transform: scale(0.97);
-    }
-
+    .stats-panel { display: flex; gap: 8px; font-size: 0.95rem; font-weight: 700; }
     .badge { padding: 4px 12px; border-radius: 20px; }
     .badge-arrived { background: rgba(46, 204, 113, 0.18); color: var(--green); border: 1px solid var(--green); }
     .badge-pending { background: rgba(230, 57, 70, 0.18); color: var(--red); border: 1px solid var(--red); }
@@ -414,8 +392,6 @@
     <header>
       <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
       <div class="stats-panel">
-        <!-- BUTON FULLSCREEN PLASAT ÎNAINTE DE SOSIȚI -->
-        <button class="btn-fs-top" onclick="toggleFullScreen()" title="Ecran Complet">⛶ FULLSCREEN</button>
         <div class="badge badge-arrived" id="statArrived">SOSIȚI: 0</div>
         <div class="badge badge-pending" id="statRemaining">RĂMAȘI: 0</div>
         <div class="badge badge-total" id="statTotal">TOTAL: 0</div>
@@ -514,10 +490,10 @@
     </div>
   </div>
 
-  <!-- Butoane Bară Admin Jos -->
+  <!-- Butoane Bară Admin -->
   <div class="admin-bar">
     <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
-    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Ecran Complet</button>
   </div>
 
   <!-- Modal Admin -->
@@ -530,6 +506,7 @@
         <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
       </div>
 
+      <!-- Video / Poza de sus -->
       <div class="form-group">
         <label>🎬 Video sau Poză Header (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -539,6 +516,7 @@
         </div>
       </div>
 
+      <!-- Schița de jos -->
       <div class="form-group">
         <label>🗺 Poză Schiță Sală (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -575,6 +553,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     let currentSelectedIndex = -1;
     let autoResetTimer = null;
 
+    // Stocare separată pentru sursele media curente
     let activePlayerMedia = "";
     let activeSalaImage = "";
 
@@ -632,11 +611,13 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       updateStats();
     }
 
+    // ÎNCĂRCARE VIDEO / IMAGINE SUS
     function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const isVideo = file.type.startsWith('video');
+      // Dacă este video se folosește un ObjectURL rapid; pentru imagini se salvează în memorie
       if (isVideo) {
         activePlayerMedia = URL.createObjectURL(file);
         applyPlayerMedia(activePlayerMedia);
@@ -683,6 +664,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       }
     }
 
+    // ÎNCĂRCARE SCHIȚĂ JOS (Conversie directă Base64 ca să nu dispară niciodată)
     function handleSalaUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -709,6 +691,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     }
 
     function saveConfig() {
+      // Păstrează sursele existente dacă utilizatorul nu a scris alt URL manual
       const manualPlayer = document.getElementById('cfgPlayerMedia').value.trim();
       const manualSala = document.getElementById('cfgSalaImg').value.trim();
 
@@ -730,7 +713,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       try {
         localStorage.setItem('kiosk_config_v5', JSON.stringify(cfg));
       } catch(e) {
-        console.warn("Storage plin:", e);
+        console.warn("Storage plin, salvare fără fișiere mari în localStorage:", e);
       }
 
       applyPlayerMedia(activePlayerMedia);
@@ -899,7 +882,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
 
     function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
     function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
-    
     function toggleFullScreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
