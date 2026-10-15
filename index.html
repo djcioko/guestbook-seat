@@ -58,9 +58,31 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 50%;
+      max-width: 45%;
     }
-    .stats-panel { display: flex; gap: 8px; font-size: 0.95rem; font-weight: 700; }
+    .stats-panel { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 700; }
+    
+    /* BUTONUL FULLSCREEN DIN HEADER (INAINTE DE SOSITI) */
+    .btn-fs-top {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 5px 13px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-fs-top:active {
+      background: var(--primary);
+      color: #000;
+      transform: scale(0.97);
+    }
+
     .badge { padding: 4px 12px; border-radius: 20px; }
     .badge-arrived { background: rgba(46, 204, 113, 0.18); color: var(--green); border: 1px solid var(--green); }
     .badge-pending { background: rgba(230, 57, 70, 0.18); color: var(--red); border: 1px solid var(--red); }
@@ -75,7 +97,7 @@
       gap: 14px;
     }
 
-    /* STÂNGA: CĂUTARE + REZULTAT + TASTATURĂ */
+    /* STÂNGA: CĂUTARE + REZULTATE SUB TEXT + QR + TASTATURĂ */
     .search-section {
       display: flex;
       flex-direction: column;
@@ -96,6 +118,40 @@
       color: #fff;
       outline: none;
       box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+
+    /* LISTA CU REZULTATE CHIAR SUB BARA DE CĂUTARE */
+    .matches-container {
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .matches-list {
+      max-height: 105px;
+      overflow-y: auto;
+      background: #14171f;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .match-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #232733;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .match-item:hover, .match-item.active-item { 
+      background: rgba(255,215,0,0.22); 
+      color: #fff; 
+    }
+    .match-item .status { 
+      font-size: 0.8rem; 
+      opacity: 0.85; 
+      font-weight: 700;
     }
 
     .result-qr-row {
@@ -162,28 +218,6 @@
       justify-content: center; 
     }
     .qr-mini-label { font-size: 0.68rem; color: var(--primary); font-weight: 800; margin-top: 4px; }
-
-    /* LISTA REZULTATE CU SCROLL */
-    .matches-container {
-      position: relative;
-      flex: 0 0 auto;
-    }
-    .matches-list {
-      max-height: 90px;
-      overflow-y: auto;
-      background: #14171f;
-      border-radius: 8px;
-      display: none;
-      border: 1px solid #383e4d;
-    }
-    .match-item {
-      padding: 7px 12px;
-      border-bottom: 1px solid #232733;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-    .match-item:hover, .match-item.active-item { background: rgba(255,215,0,0.22); color: #fff; }
-    .match-item .status { float: right; font-size: 0.8rem; opacity: 0.85; }
 
     /* TASTATURĂ FĂRĂ DIACRITICE */
     .keyboard {
@@ -392,6 +426,8 @@
     <header>
       <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
       <div class="stats-panel">
+        <!-- BUTON FULLSCREEN PLASAT ÎNAINTE DE SOSIȚI -->
+        <button class="btn-fs-top" onclick="toggleFullScreen()" title="Ecran Complet">⛶ FULLSCREEN</button>
         <div class="badge badge-arrived" id="statArrived">SOSIȚI: 0</div>
         <div class="badge badge-pending" id="statRemaining">RĂMAȘI: 0</div>
         <div class="badge badge-total" id="statTotal">TOTAL: 0</div>
@@ -402,6 +438,11 @@
       <!-- PARTEA STÂNGĂ -->
       <div class="search-section">
         <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." autocomplete="off">
+
+        <!-- LISTA CU TOATE NUMELE GĂSITE, CHIAR SUB BARA DE TEXT -->
+        <div class="matches-container">
+          <div class="matches-list" id="matchesList"></div>
+        </div>
 
         <div class="result-qr-row">
           <div class="result-card">
@@ -415,10 +456,6 @@
             <div id="qrcode"></div>
             <div class="qr-mini-label">SCAN PE MOBIL</div>
           </div>
-        </div>
-
-        <div class="matches-container">
-          <div class="matches-list" id="matchesList"></div>
         </div>
 
         <!-- TASTATURĂ FĂRĂ DIACRITICE -->
@@ -490,10 +527,10 @@
     </div>
   </div>
 
-  <!-- Butoane Bară Admin -->
+  <!-- Butoane Bară Admin Jos -->
   <div class="admin-bar">
     <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
-    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Ecran Complet</button>
+    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Fullscreen</button>
   </div>
 
   <!-- Modal Admin -->
@@ -506,7 +543,6 @@
         <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
       </div>
 
-      <!-- Video / Poza de sus -->
       <div class="form-group">
         <label>🎬 Video sau Poză Header (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -516,7 +552,6 @@
         </div>
       </div>
 
-      <!-- Schița de jos -->
       <div class="form-group">
         <label>🗺 Poză Schiță Sală (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -553,7 +588,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     let currentSelectedIndex = -1;
     let autoResetTimer = null;
 
-    // Stocare separată pentru sursele media curente
     let activePlayerMedia = "";
     let activeSalaImage = "";
 
@@ -611,13 +645,11 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       updateStats();
     }
 
-    // ÎNCĂRCARE VIDEO / IMAGINE SUS
     function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const isVideo = file.type.startsWith('video');
-      // Dacă este video se folosește un ObjectURL rapid; pentru imagini se salvează în memorie
       if (isVideo) {
         activePlayerMedia = URL.createObjectURL(file);
         applyPlayerMedia(activePlayerMedia);
@@ -664,7 +696,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       }
     }
 
-    // ÎNCĂRCARE SCHIȚĂ JOS (Conversie directă Base64 ca să nu dispară niciodată)
     function handleSalaUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -691,7 +722,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     }
 
     function saveConfig() {
-      // Păstrează sursele existente dacă utilizatorul nu a scris alt URL manual
       const manualPlayer = document.getElementById('cfgPlayerMedia').value.trim();
       const manualSala = document.getElementById('cfgSalaImg').value.trim();
 
@@ -713,7 +743,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       try {
         localStorage.setItem('kiosk_config_v5', JSON.stringify(cfg));
       } catch(e) {
-        console.warn("Storage plin, salvare fără fișiere mari în localStorage:", e);
+        console.warn("Storage plin:", e);
       }
 
       applyPlayerMedia(activePlayerMedia);
@@ -798,11 +828,11 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       listEl.innerHTML = '';
     }
 
+    // Afișează toate numele găsite chiar sub input
     function searchGuest(query) {
       const cleanQ = cleanText(query);
       const listEl = document.getElementById('matchesList');
       listEl.innerHTML = '';
-      listEl.style.display = 'none';
 
       if (!cleanQ) {
         clearSearch();
@@ -814,6 +844,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         .filter(g => cleanText(g.name).includes(cleanQ));
 
       if (matches.length === 0) {
+        listEl.style.display = 'none';
         document.getElementById('resName').innerText = 'Numele nu a fost găsit...';
         document.getElementById('resTable').innerText = 'MASA: ---';
         document.getElementById('resZone').innerText = 'Verificați literele introduse';
@@ -821,19 +852,23 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         return;
       }
 
-      if (matches.length === 1) {
-        selectGuest(matches[0].idx);
-      } else {
-        listEl.style.display = 'block';
-        matches.forEach(m => {
-          const div = document.createElement('div');
-          div.className = 'match-item' + (m.idx === currentSelectedIndex ? ' active-item' : '');
-          div.innerHTML = `${m.name} <span class="status">${m.arrived ? '✓ Sosit' : '— În așteptare'}</span>`;
-          div.onclick = () => selectGuest(m.idx);
-          listEl.appendChild(div);
-        });
-        selectGuest(matches[0].idx);
-      }
+      // Afișează lista cu toate numele găsite sub input
+      listEl.style.display = 'block';
+      matches.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'match-item' + (m.idx === currentSelectedIndex ? ' active-item' : '');
+        div.innerHTML = `<span>👤 ${m.name} (${m.table})</span><span class="status">${m.arrived ? '✓ Sosit' : '— În așteptare'}</span>`;
+        div.onclick = () => {
+          selectGuest(m.idx);
+          // Actualizează inputul cu numele selectat și restrânge lista
+          document.getElementById('searchInput').value = m.name;
+          listEl.style.display = 'none';
+        };
+        listEl.appendChild(div);
+      });
+
+      // Selectează automat primul invitat găsit
+      selectGuest(matches[0].idx);
     }
 
     function selectGuest(idx) {
@@ -882,6 +917,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
 
     function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
     function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+    
     function toggleFullScreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
