@@ -19,10 +19,15 @@ header{display:flex;justify-content:space-between;align-items:center;background:
 .body{flex:1;display:grid;grid-template-columns:1.35fr 1fr;gap:12px;min-height:0;}
 .left{display:flex;flex-direction:column;gap:8px;min-height:0;}
 .search{width:100%;padding:10px 14px;font-size:1.2rem;font-weight:700;border-radius:8px;border:2px solid var(--gold);background:#0d1117;color:#fff;outline:none;}
-.result{background:var(--card);border-radius:12px;padding:12px 16px;border:1px solid rgba(255,215,0,.3);min-height:110px;display:flex;flex-direction:column;justify-content:center;}
-.r-name{font-size:1.8rem;font-weight:800;text-align:center;}
-.r-table{font-size:2rem;font-weight:900;color:var(--gold);text-align:center;margin:4px 0;}
-.r-zone{font-size:1rem;color:var(--cyan);text-align:center;}
+.result-row{display:flex;gap:8px;align-items:stretch;}
+.result{flex:1;background:var(--card);border-radius:12px;padding:12px 16px;border:1px solid rgba(255,215,0,.3);display:flex;flex-direction:column;justify-content:center;min-height:110px;}
+.r-name{font-size:1.6rem;font-weight:800;text-align:center;}
+.r-table{font-size:1.9rem;font-weight:900;color:var(--gold);text-align:center;margin:4px 0;}
+.r-zone{font-size:.95rem;color:var(--cyan);text-align:center;}
+.prompt-btn{display:block;width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:1.3rem;font-weight:800;cursor:pointer;text-align:center;margin-bottom:6px;}
+.qr-left{flex:0 0 110px;background:#fff;border-radius:10px;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.qr-left canvas,.qr-left img{display:block;}
+.qr-label{font-size:.65rem;color:#000;font-weight:800;margin-top:2px;text-align:center;}
 .matches{display:none;flex-wrap:wrap;gap:6px;max-height:80px;overflow-y:auto;}
 .cube{background:#1a2230;border:1px solid #3a4555;border-radius:20px;padding:6px 12px;font-size:.85rem;cursor:pointer;white-space:nowrap;}
 .cube:hover,.cube.on{background:rgba(255,215,0,.25);border-color:var(--gold);}
@@ -55,8 +60,7 @@ header{display:flex;justify-content:space-between;align-items:center;background:
 .fg{margin-bottom:10px;}
 .fg label{display:block;font-size:.8rem;color:#aaa;margin-bottom:3px;font-weight:700;}
 .fg input,.fg textarea{width:100%;padding:8px 10px;border-radius:6px;background:#0c0e12;border:1px solid #333;color:#fff;font-size:.9rem;}
-.qrbox{position:absolute;bottom:8px;right:8px;background:#fff;padding:4px;border-radius:8px;z-index:5;}
-.qrbox canvas,.qrbox img{display:block;}
+.guest-mode .admin,.guest-mode .fs{display:none !important;}
 </style>
 </head>
 <body>
@@ -70,12 +74,16 @@ header{display:flex;justify-content:space-between;align-items:center;background:
   </header>
   <div class="body">
     <div class="left">
-      <input id="q" class="search" placeholder="Tastați numele..." autocomplete="off">
-      <div class="result">
-        <div class="r-name" id="rn">Tastați numele</div>
-        <div class="r-table" id="rt">MASA: ---</div>
-        <div class="r-zone" id="rz"></div>
-        <button id="chk" onclick="check()" style="display:none;margin-top:8px;padding:8px;background:var(--green);border:none;border-radius:8px;font-weight:800;cursor:pointer;">Sosir ✓</button>
+      <button class="prompt-btn" onclick="focusSearch()">Tastați numele</button>
+      <input id="q" class="search" placeholder="" autocomplete="off" readonly>
+      <div class="result-row">
+        <div class="result">
+          <div class="r-name" id="rn">Tastați pe tastatură</div>
+          <div class="r-table" id="rt">MASA: ---</div>
+          <div class="r-zone" id="rz"></div>
+          <button id="chk" onclick="check()" style="display:none;margin-top:8px;padding:8px;background:var(--green);border:none;border-radius:8px;font-weight:800;cursor:pointer;">Sosir ✓</button>
+        </div>
+        <div class="qr-left" id="qr"></div>
       </div>
       <div class="matches" id="matches"></div>
       <div class="kb">
@@ -109,7 +117,6 @@ header{display:flex;justify-content:space-between;align-items:center;background:
 </div>
 <button class="fs" onclick="fs()">⛶</button>
 <div class="admin"><button class="abtn" onclick="openM()">⚙ Panou Control</button></div>
-<div class="qrbox" id="qr"></div>
 <div id="modal">
   <div class="box">
     <h2 style="color:var(--gold);margin-bottom:12px;">Panou Control</h2>
@@ -124,7 +131,7 @@ header{display:flex;justify-content:space-between;align-items:center;background:
       <input type="file" id="fileM" accept="image/*" onchange="upMap(event)" style="margin-bottom:6px;">
       <input id="cfgM" placeholder="sau URL schiță">
     </div>
-    <div class="fg"><label>Link QR (lista pe telefon)</label><input id="cfgQ" value="https://drive.google.com"></div>
+    <div class="fg"><label>Link QR (opțional – dacă lași gol, folosește linkul de invitat)</label><input id="cfgQ" placeholder="https://..."></div>
     <div class="fg"><label>Listă invitați (Nume | Masa | Zona) — unul pe linie</label><textarea id="cfgL" rows="6">Marioara Marian | Masa 3 | Lângă scenă
 Galatanu Marinela | Masa 1 | Intrare
 Botorogeanu Marian | Masa 2 | Geam
@@ -138,6 +145,8 @@ Marioara Florina | Masa 3 | Lângă scenă</textarea></div>
 </div>
 <script>
 let G=[], cur=-1, timer=null, media="", mapu="";
+const isGuest = new URLSearchParams(location.search).get("view") === "guest";
+if(isGuest) document.body.classList.add("guest-mode");
 function clean(s){return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ș|ş/gi,"s").replace(/ț|ţ/gi,"t").toUpperCase().trim();}
 onload=()=>{document.getElementById("q").oninput=e=>{search(e.target.value);arm();};load();};
 function load(){
@@ -151,9 +160,22 @@ function load(){
     document.getElementById("cfgQ").value=j.q||"";
     document.getElementById("cfgL").value=j.l;
     media=j.v||""; mapu=j.m||"";
-    setMedia(media); setMap(mapu); parse(j.l,st); qr(j.q);
-  }else{parse(document.getElementById("cfgL").value,{}); setMedia(document.getElementById("cfgV").value); qr(document.getElementById("cfgQ").value);}
+    setMedia(media); setMap(mapu); parse(j.l,st); makeQR(j.q);
+  }else{parse(document.getElementById("cfgL").value,{}); setMedia(document.getElementById("cfgV").value); makeQR("");}
   stats();
+}
+function guestUrl(){
+  const u = new URL(location.href);
+  u.searchParams.set("view","guest");
+  return u.toString();
+}
+function makeQR(custom){
+  const c=document.getElementById("qr"); c.innerHTML="";
+  const url = custom && custom.trim() ? custom.trim() : guestUrl();
+  if(typeof QRCode!=="undefined"){
+    new QRCode(c,{text:url,width:90,height:90,colorDark:"#000",colorLight:"#fff"});
+    const lbl=document.createElement("div"); lbl.className="qr-label"; lbl.textContent="SCAN"; c.appendChild(lbl);
+  }
 }
 function setMedia(u){
   const v=document.getElementById("v"), i=document.getElementById("imgv");
@@ -175,11 +197,8 @@ function setMap(u){
 }
 function upVideo(e){
   const f=e.target.files[0]; if(!f)return;
-  if(f.type.startsWith("video")){
-    media=URL.createObjectURL(f); setMedia(media);
-  }else{
-    const r=new FileReader(); r.onload=ev=>{media=ev.target.result; setMedia(media);}; r.readAsDataURL(f);
-  }
+  if(f.type.startsWith("video")){ media=URL.createObjectURL(f); setMedia(media); }
+  else{ const r=new FileReader(); r.onload=ev=>{media=ev.target.result; setMedia(media);}; r.readAsDataURL(f); }
 }
 function upMap(e){
   const f=e.target.files[0]; if(!f)return;
@@ -193,7 +212,7 @@ function save(){
   const o={t:document.getElementById("cfgT").value,v:media,m:mapu,q:document.getElementById("cfgQ").value.trim(),l:document.getElementById("cfgL").value};
   try{localStorage.setItem("k7",JSON.stringify(o));}catch(e){console.warn("storage",e);}
   document.getElementById("title").textContent=o.t;
-  setMedia(media); setMap(mapu); parse(o.l,JSON.parse(localStorage.getItem("k7s")||"{}")); qr(o.q);
+  setMedia(media); setMap(mapu); parse(o.l,JSON.parse(localStorage.getItem("k7s")||"{}")); makeQR(o.q);
   closeM(); clearQ();
 }
 function resetEv(){
@@ -211,15 +230,11 @@ function stats(){
   document.getElementById("arr").textContent="SOSIȚI: "+a;
   document.getElementById("tot").textContent="TOTAL: "+G.length;
 }
-function qr(u){
-  const c=document.getElementById("qr"); c.innerHTML="";
-  if(typeof QRCode!=="undefined" && u) new QRCode(c,{text:u,width:90,height:90,colorDark:"#000",colorLight:"#fff"});
-}
 function k(ch){const i=document.getElementById("q");i.value+=ch;search(i.value);arm();}
 function bs(){const i=document.getElementById("q");i.value=i.value.slice(0,-1);search(i.value);arm();}
 function clearQ(){
   document.getElementById("q").value=""; cur=-1;
-  document.getElementById("rn").textContent="Tastați numele";
+  document.getElementById("rn").textContent="Tastați pe tastatură";
   document.getElementById("rt").textContent="MASA: ---";
   document.getElementById("rz").textContent="";
   document.getElementById("chk").style.display="none";
@@ -257,6 +272,7 @@ function arm(){if(timer)clearTimeout(timer);timer=setTimeout(clearQ,15000);}
 function openM(){document.getElementById("modal").style.display="flex";}
 function closeM(){document.getElementById("modal").style.display="none";}
 function fs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+function focusSearch(){/* just a visual cue – keyboard is always visible */ }
 </script>
 </body>
 </html>
