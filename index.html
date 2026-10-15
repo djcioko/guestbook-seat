@@ -3,150 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>EventKiosk - Find My Seat & VideoBooth</title>
+  <title>EventKiosk - Find My Seat & Video Player</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       --primary: #ffd700;
       --accent: #00ffcc;
-      --bg: #0a0a0c;
-      --card-bg: rgba(20, 22, 28, 0.94);
+      --bg: #0b0c10;
+      --card-bg: rgba(20, 22, 28, 0.95);
       --red: #e63946;
       --green: #2ecc71;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background: var(--bg); color: #fff; overflow: hidden; width: 100vw; height: 100vh; position: relative; }
 
-    /* Fundal Media (Video sau Foto) */
-    #mediaBackgroundVideo {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      object-fit: cover; z-index: 0; opacity: 0.38; filter: saturate(1.2);
-    }
-    #mediaBackgroundImage {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      object-fit: cover; z-index: 0; opacity: 0.38; filter: saturate(1.2); display: none;
-    }
-    .overlay-backdrop {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, rgba(10,10,12,0.3) 0%, rgba(10,10,12,0.92) 100%);
-      z-index: 1; pointer-events: none;
-    }
-
     #kioskApp {
       position: relative; z-index: 2; width: 100%; height: 100%;
-      display: flex; flex-direction: column; padding: 14px 20px;
+      display: flex; flex-direction: column; padding: 12px 18px;
     }
 
     header {
       display: flex; justify-content: space-between; align-items: center;
-      background: var(--card-bg); padding: 12px 22px; border-radius: 14px;
+      background: var(--card-bg); padding: 10px 20px; border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px);
     }
-    .event-title { font-size: 1.45rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+    .event-title { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
     .stats-panel { display: flex; gap: 12px; font-size: 1.05rem; font-weight: 700; }
     .badge { padding: 5px 14px; border-radius: 20px; }
     .badge-arrived { background: rgba(46, 204, 113, 0.2); color: var(--green); border: 1px solid var(--green); }
     .badge-pending { background: rgba(230, 57, 70, 0.2); color: var(--red); border: 1px solid var(--red); }
     .badge-total { background: rgba(255, 255, 255, 0.1); color: #ccc; }
 
+    /* Corpul Kiosk: 2 Coloane */
     .kiosk-body {
-      display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px;
-      flex: 1; margin: 12px 0; min-height: 0;
+      display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px;
+      flex: 1; margin: 10px 0; min-height: 0;
     }
 
+    /* Stânga: Căutare + Rezultat + QR MUTAT AICI + Tastatură */
     .search-section { display: flex; flex-direction: column; height: 100%; }
     .search-input {
-      width: 100%; padding: 14px 18px; font-size: 1.4rem; font-weight: 700;
+      width: 100%; padding: 12px 16px; font-size: 1.35rem; font-weight: 700;
       border-radius: 12px; border: 2px solid var(--primary); background: rgba(15,15,18,0.95);
-      color: #fff; outline: none; box-shadow: 0 0 14px rgba(255, 215, 0, 0.2);
+      color: #fff; outline: none; box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
     }
 
+    /* Rând Orizontal: Card Rezultat + Cod QR stânga */
+    .result-qr-row {
+      display: flex; gap: 12px; margin: 8px 0; align-items: stretch;
+    }
     .result-card {
-      background: var(--card-bg); border-radius: 14px; padding: 14px 16px;
-      border: 1px solid rgba(255,215,0,0.35); margin-top: 10px; display: flex; flex-direction: column;
+      flex: 1; background: var(--card-bg); border-radius: 12px; padding: 12px 14px;
+      border: 1px solid rgba(255,215,0,0.35); display: flex; flex-direction: column; justify-content: center;
     }
-    .res-name { font-size: 1.35rem; font-weight: 700; }
-    .res-table { font-size: 2.1rem; font-weight: 900; color: var(--primary); margin: 3px 0; }
-    .res-zone { font-size: 1.05rem; color: var(--accent); }
-    .res-teaser {
-      margin-top: 8px; font-size: 0.9rem; color: #fff; background: rgba(230, 57, 70, 0.18);
-      padding: 6px 12px; border-radius: 8px; border-left: 4px solid var(--red);
-    }
+    .res-name { font-size: 1.25rem; font-weight: 700; }
+    .res-table { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 2px 0; }
+    .res-zone { font-size: 0.95rem; color: var(--accent); }
     .btn-checkin {
-      margin-top: 10px; padding: 12px; font-size: 1.15rem; font-weight: 800;
-      background: var(--green); color: #000; border: none; border-radius: 10px;
+      margin-top: 8px; padding: 10px; font-size: 1.05rem; font-weight: 800;
+      background: var(--green); color: #000; border: none; border-radius: 8px;
       cursor: pointer; display: none; text-transform: uppercase;
     }
     .btn-checkin:disabled { background: #444 !important; color: #aaa; cursor: default; }
 
-    .matches-list {
-      margin-top: 8px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.4);
-      border-radius: 10px; display: none; border: 1px solid #333;
+    /* Panou QR stânga */
+    .qr-card-left {
+      width: 125px; background: var(--card-bg); border-radius: 12px; padding: 8px;
+      border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
     }
-    .match-item {
-      padding: 8px 12px; border-bottom: 1px solid #282828; cursor: pointer; font-size: 1rem;
-    }
-    .match-item:hover { background: rgba(255,215,0,0.15); }
-    .match-item .status { float: right; font-size: 0.82rem; opacity: 0.8; }
+    #qrcode { background: #fff; padding: 6px; border-radius: 8px; }
+    .qr-mini-label { font-size: 0.72rem; color: var(--primary); font-weight: 700; margin-top: 4px; }
 
-    .keyboard { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
-    .kb-row { display: flex; gap: 5px; justify-content: center; }
+    .matches-list {
+      max-height: 90px; overflow-y: auto; background: rgba(0,0,0,0.5);
+      border-radius: 8px; display: none; border: 1px solid #333; margin-bottom: 6px;
+    }
+    .match-item { padding: 6px 10px; border-bottom: 1px solid #282828; cursor: pointer; font-size: 0.95rem; }
+    .match-item:hover { background: rgba(255,215,0,0.15); }
+    .match-item .status { float: right; font-size: 0.8rem; opacity: 0.8; }
+
+    /* Tastatură tactilă */
+    .keyboard { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+    .kb-row { display: flex; gap: 4px; justify-content: center; }
     .key-btn {
-      flex: 1; height: 48px; font-size: 1.15rem; font-weight: 800; border: none;
-      border-radius: 9px; background: #232730; color: #fff; cursor: pointer;
-      box-shadow: 0 3px 0 #111;
+      flex: 1; height: 44px; font-size: 1.1rem; font-weight: 800; border: none;
+      border-radius: 8px; background: #232730; color: #fff; cursor: pointer;
+      box-shadow: 0 2px 0 #111;
     }
     .key-btn:active { background: var(--primary); color: #000; transform: translateY(2px); }
-    .key-btn.wide { flex: 2.2; background: #343a40; font-size: 0.95rem; }
+    .key-btn.wide { flex: 2.2; background: #343a40; font-size: 0.9rem; }
     .key-btn.back { background: #b71c1c; flex: 1.6; }
 
-    .side-section {
-      background: var(--card-bg); border-radius: 14px; padding: 14px;
-      border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
-      align-items: center; text-align: center; justify-content: space-between;
+    /* Dreapta: Player Video / Foto (Sus) + Schiță Sală (Jos) */
+    .right-section {
+      display: flex; flex-direction: column; gap: 12px; height: 100%;
     }
-    #qrcode { background: #fff; padding: 8px; border-radius: 10px; margin: 6px 0; }
-    .qr-text { font-size: 0.9rem; font-weight: 600; color: #bbb; }
 
-    .sala-box {
-      width: 100%; flex: 1; margin-top: 10px; border-radius: 12px;
-      background: #111419; border: 2px dashed rgba(255,215,0,0.4);
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; position: relative; overflow: hidden;
+    /* Player Video Fereastră dedicată */
+    .video-card {
+      flex: 1.1; background: var(--card-bg); border-radius: 14px;
+      border: 1px solid rgba(255,215,0,0.3); position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
     }
-    #salaImg { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .sala-badge-info {
-      position: absolute; bottom: 8px; background: rgba(0,0,0,0.75);
-      color: var(--primary); padding: 4px 10px; border-radius: 6px;
-      font-size: 0.8rem; font-weight: 700;
+    .video-header-bar {
+      position: absolute; top: 0; left: 0; width: 100%; z-index: 5;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+      padding: 6px 12px; display: flex; justify-content: space-between; align-items: center;
     }
-    .no-map-msg { padding: 15px; color: #888; font-size: 0.9rem; line-height: 1.4; }
+    .video-title-tag { font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+    .vol-btn {
+      background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.3); color: #fff;
+      border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .vol-btn.active-sound { background: var(--green); color: #000; border-color: var(--green); }
 
+    .player-media-wrap {
+      width: 100%; height: 100%; position: relative; background: #000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #dedicatedVideo {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    #dedicatedImage {
+      width: 100%; height: 100%; object-fit: contain; display: none;
+    }
+
+    /* Fereastra Schiță Sală (Sub Video) */
+    .map-card {
+      flex: 1; background: var(--card-bg); border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #salaImg { width: 100%; height: 100%; object-fit: contain; display: none; }
+    .no-map-msg { padding: 15px; color: #777; font-size: 0.85rem; text-align: center; }
+    .map-badge-tag {
+      position: absolute; top: 6px; left: 10px; background: rgba(0,0,0,0.7);
+      color: var(--accent); padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800;
+    }
+
+    /* Admin Bar (Stânga jos) */
     .admin-bar {
       position: absolute; bottom: 6px; left: 14px; z-index: 10;
       display: flex; gap: 8px; opacity: 0.35; transition: opacity 0.3s;
     }
     .admin-bar:hover { opacity: 1; }
     .btn-admin {
-      background: #2b2d42; color: #fff; border: none; padding: 7px 14px;
-      border-radius: 8px; font-size: 0.82rem; cursor: pointer; font-weight: 700;
+      background: #2b2d42; color: #fff; border: none; padding: 6px 12px;
+      border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: 700;
     }
 
-    #adminModal, #transitionModal {
+    /* Modal Admin */
+    #adminModal {
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9); z-index: 99; backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.92); z-index: 99; backdrop-filter: blur(8px);
       align-items: center; justify-content: center;
     }
     .admin-content {
       background: #181a20; border: 1px solid var(--primary); border-radius: 16px;
-      padding: 22px; width: 92%; max-width: 720px; max-height: 90vh; overflow-y: auto;
+      padding: 20px; width: 92%; max-width: 680px; max-height: 90vh; overflow-y: auto;
     }
     .upload-box {
       background: #222630; border: 1px dashed #555; padding: 10px; border-radius: 8px; margin-top: 4px;
     }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.85rem; color: #bbb; margin-bottom: 3px; font-weight: 700; }
-    .form-group input[type="text"], .form-group input[type="number"], .form-group textarea {
+    .form-group input[type="text"], .form-group textarea {
       width: 100%; padding: 8px 10px; border-radius: 8px; background: #0e1014;
       border: 1px solid #333; color: #fff; font-size: 0.92rem;
     }
@@ -154,13 +176,8 @@
 </head>
 <body>
 
-  <!-- Media Background (Video sau Imagine) -->
-  <video id="mediaBackgroundVideo" autoplay loop muted playsinline src="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4"></video>
-  <img id="mediaBackgroundImage" alt="Fundal">
-  <div class="overlay-backdrop"></div>
-
-  <!-- Kiosk App -->
   <div id="kioskApp">
+    <!-- Header Statistici -->
     <header>
       <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
       <div class="stats-panel">
@@ -171,23 +188,29 @@
     </header>
 
     <div class="kiosk-body">
-      <!-- Stânga: Căutare + Rezultat + Tastatură -->
+      <!-- PARTEA STÂNGĂ: Căutare + QR + Rezultat + Tastatură -->
       <div class="search-section">
         <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." readonly>
 
-        <div class="result-card">
-          <div class="res-name" id="resName">Tastați numele pe tastatură</div>
-          <div class="res-table" id="resTable">MASA: ---</div>
-          <div class="res-zone" id="resZone">Zona: ---</div>
-          <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
-          <div class="res-teaser" id="resTeaser">
-            🎥 Atenție: Acest ecran devine <b>VideoBooth</b> după primirea invitaților!
+        <div class="result-qr-row">
+          <!-- Card Rezultat Invitat -->
+          <div class="result-card">
+            <div class="res-name" id="resName">Tastați numele dvs. pe tastatură</div>
+            <div class="res-table" id="resTable">MASA: ---</div>
+            <div class="res-zone" id="resZone">Zona: ---</div>
+            <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
+          </div>
+
+          <!-- Cod QR mutat în stânga -->
+          <div class="qr-card-left">
+            <div id="qrcode"></div>
+            <div class="qr-mini-label">SCAN PE MOBIL</div>
           </div>
         </div>
 
         <div class="matches-list" id="matchesList"></div>
 
-        <!-- Tastatură tactilă -->
+        <!-- Tastatura tactilă -->
         <div class="keyboard">
           <div class="kb-row">
             <button class="key-btn" onclick="pressKey('A')">A</button>
@@ -230,72 +253,78 @@
         </div>
       </div>
 
-      <!-- Dreapta: QR + Schița Sălii -->
-      <div class="side-section">
-        <div style="font-weight: 800; color: var(--primary);">SCAN PE MOBIL</div>
-        <div id="qrcode"></div>
-        <div class="qr-text">Scanați pentru lista și schița pe telefon</div>
-
-        <!-- Container Afișare Schiță Sală -->
-        <div class="sala-box" id="salaBox">
-          <img id="salaImg" src="" alt="Schiță Sală Restaurant" style="display:none;">
-          <div class="no-map-msg" id="noMapMsg">
-            🗺 <b>Fără Schiță Încărcată</b><br>
-            Mergi în <i>⚙ Panou Control & Upload</i> și alege poza schiței din tabletă.
+      <!-- PARTEA DREAPTĂ: Player Video / Foto (Sus) + Schiță (Jos) -->
+      <div class="right-section">
+        <!-- 1. Player Video Loop cu Mute / Unmute -->
+        <div class="video-card">
+          <div class="video-header-bar">
+            <div class="video-title-tag" id="dispVideoTag">MOMENTE SPECIALE</div>
+            <button class="vol-btn" id="btnToggleAudio" onclick="toggleVideoAudio()">🔇 SUNET OPRIT</button>
           </div>
-          <div class="sala-badge-info" id="salaBadgeInfo" style="display:none;">SCHIȚĂ RESTAURANT</div>
+          <div class="player-media-wrap">
+            <video id="dedicatedVideo" autoplay loop muted playsinline src="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4"></video>
+            <img id="dedicatedImage" alt="Prezentare">
+          </div>
+        </div>
+
+        <!-- 2. Fereastră Schiță Sală (Jos sub video) -->
+        <div class="map-card">
+          <div class="map-badge-tag">🗺 SCHIȚĂ SALĂ</div>
+          <img id="salaImg" src="" alt="Schiță Sală Restaurant">
+          <div class="no-map-msg" id="noMapMsg">
+            Fără schiță încărcată.<br>
+            Apasă <b>⚙ Panou Control</b> și alege poza schiței din tabletă.
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Butoane Control (Stânga Jos) -->
+  <!-- Bara Admin Stânga Jos -->
   <div class="admin-bar">
-    <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Upload</button>
+    <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
     <button class="btn-admin" onclick="toggleFullScreen()">⛶ Fullscreen</button>
-    <button class="btn-admin" onclick="manualSwitchToVideoBooth()">🔴 VideoBooth</button>
   </div>
 
-  <!-- Modal Admin / Setări / Upload DIRECT din Tabletă -->
+  <!-- Modal Admin -->
   <div id="adminModal">
     <div class="admin-content">
-      <h2 style="color:var(--primary); margin-bottom: 12px;">⚙ Panou Control & Încărcare Fișiere</h2>
+      <h2 style="color:var(--primary); margin-bottom: 12px;">⚙ Panou Control Eveniment</h2>
 
       <div class="form-group">
         <label>Titlu Eveniment (Nume Miri / Botez):</label>
         <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
       </div>
 
-      <!-- 1. UPLOAD SCHIȚĂ SALĂ -->
+      <!-- Video / Poză Player Dreapta-Sus -->
       <div class="form-group">
-        <label>🗺 1. Schiță Sală Restaurant (Alege poză din tabletă sau fă poză cu camera):</label>
+        <label>🎬 Video Loop sau Poză pt Player (Alege direct din tabletă/laptop):</label>
+        <div class="upload-box">
+          <input type="file" id="filePlayerInput" accept="video/*,image/*" onchange="handlePlayerUpload(event)">
+          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau fișier local/link extern (ex: <i>video.mp4</i>):</div>
+          <input type="text" id="cfgPlayerMedia" value="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4" style="margin-top:4px;">
+        </div>
+      </div>
+
+      <!-- Schiță Sală Dreapta-Jos -->
+      <div class="form-group">
+        <label>🗺 Poză Schiță Sală (Alege poza din tabletă sau fă poză cu camera):</label>
         <div class="upload-box">
           <input type="file" id="fileSalaInput" accept="image/*" onchange="handleSalaUpload(event)">
-          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau link extern de pe net:</div>
-          <input type="text" id="cfgSalaImg" placeholder="https://..." style="margin-top:4px;">
+          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau fișier local/link (ex: <i>schita.jpg</i>):</div>
+          <input type="text" id="cfgSalaImg" placeholder="schita.jpg" style="margin-top:4px;">
         </div>
       </div>
 
-      <!-- 2. UPLOAD FUNDAL VIDEO SAU FOTO -->
+      <!-- Link QR Cloud -->
       <div class="form-group">
-        <label>🎬 2. Fundal Video Loop sau Poză / GIF (Alege din tabletă):</label>
-        <div class="upload-box">
-          <input type="file" id="fileBgInput" accept="video/mp4,image/*" onchange="handleBgUpload(event)">
-          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau link video/foto MP4/GIF existent:</div>
-          <input type="text" id="cfgMediaBg" value="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4" style="margin-top:4px;">
-        </div>
-      </div>
-
-      <!-- 3. LINK CLOUD -->
-      <div class="form-group">
-        <label>🔗 Link Folder Cloud (Google Drive / Dropbox pentru Cod QR):</label>
+        <label>🔗 Link Cloud Invitați (Generat în Codul QR):</label>
         <input type="text" id="cfgCloudLink" value="https://drive.google.com">
       </div>
 
-      <!-- 4. LISTĂ INVITAȚI -->
+      <!-- Listă Invitați -->
       <div class="form-group">
-        <label>📋 Listă Invitați (Copy-Paste din textul extras de Gemini):<br>
-        <small style="color:#888;">Format: <b>Nume | Masa | Zona</b> (câte unul pe rând)</small></label>
+        <label>📋 Listă Invitați (Format: <b>Nume | Masa | Zona</b>):</label>
         <textarea id="cfgGuestList" rows="6">Popescu Ion | Masa 1 | Lângă ring, stânga
 Popescu Elena | Masa 1 | Lângă ring, stânga
 Ionescu Andrei | Masa 3 | Lângă bar
@@ -311,29 +340,20 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     </div>
   </div>
 
-  <!-- Modal Tranziție VideoBooth -->
-  <div id="transitionModal">
-    <h1 style="color:var(--primary); font-size: 2.5rem; margin-bottom: 12px;">SALA ESTE COMPLETĂ! 🎉</h1>
-    <p style="font-size: 1.25rem; max-width: 650px; line-height: 1.6; color: #ddd;">
-      Invitații au sosit. Tableta trece acum în modul <b>VideoBooth Interactiv</b> pentru mesaje video către miri!
-    </p>
-    <button class="btn-admin" style="margin-top:20px; font-size:1.3rem; padding:16px 32px; background:var(--red); border-radius:50px;" onclick="launchVideoBooth()">🔴 PORNEȘTE VIDEOBOOTH</button>
-  </div>
-
   <script>
     let guests = [];
     let currentSelectedIndex = -1;
     let autoResetTimer = null;
-    let uploadedSalaBase64 = "";
-    let uploadedBgBase64 = "";
+    let uploadedPlayerBlobUrl = "";
+    let uploadedSalaBlobUrl = "";
 
     window.onload = function() {
       loadSavedConfig();
     };
 
     function loadSavedConfig() {
-      const saved = localStorage.getItem('kiosk_config');
-      const savedStatus = localStorage.getItem('kiosk_status');
+      const saved = localStorage.getItem('kiosk_config_v2');
+      const savedStatus = localStorage.getItem('kiosk_status_v2');
       let statusMap = {};
       if (savedStatus) {
         try { statusMap = JSON.parse(savedStatus); } catch(e) {}
@@ -345,102 +365,100 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         document.getElementById('cfgTitle').value = cfg.title;
         document.getElementById('cfgCloudLink').value = cfg.cloudLink;
         document.getElementById('cfgGuestList').value = cfg.guestRaw;
+        document.getElementById('cfgPlayerMedia').value = cfg.playerMedia;
+        document.getElementById('cfgSalaImg').value = cfg.salaImg;
 
-        if (cfg.salaImg) {
-          applySalaImage(cfg.salaImg);
-          document.getElementById('cfgSalaImg').value = cfg.salaImg.startsWith("data:") ? "" : cfg.salaImg;
-        }
-
-        if (cfg.mediaBg) {
-          applyBackground(cfg.mediaBg);
-          document.getElementById('cfgMediaBg').value = cfg.mediaBg.startsWith("data:") ? "" : cfg.mediaBg;
-        }
-
+        applyPlayerMedia(cfg.playerMedia);
+        applySalaImage(cfg.salaImg);
         parseGuests(cfg.guestRaw, statusMap);
         renderQRCode(cfg.cloudLink);
       } else {
         parseGuests(document.getElementById('cfgGuestList').value, {});
-        applyBackground(document.getElementById('cfgMediaBg').value);
+        applyPlayerMedia(document.getElementById('cfgPlayerMedia').value);
+        applySalaImage(document.getElementById('cfgSalaImg').value);
         renderQRCode(document.getElementById('cfgCloudLink').value);
       }
       updateStats();
     }
 
-    function handleSalaUpload(event) {
+    // UPLOAD DIRECT VIDEO / POZA DIN LAPTOP/TABLETĂ (Instant prin Blob URL)
+    function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        uploadedSalaBase64 = e.target.result;
-        applySalaImage(uploadedSalaBase64);
-      };
-      reader.readAsDataURL(file);
+      uploadedPlayerBlobUrl = URL.createObjectURL(file);
+      applyPlayerMedia(uploadedPlayerBlobUrl);
     }
 
-    function applySalaImage(src) {
-      const img = document.getElementById('salaImg');
-      const noMapMsg = document.getElementById('noMapMsg');
-      const badge = document.getElementById('salaBadgeInfo');
-      if (src && src.trim() !== "") {
-        img.src = src;
-        img.style.display = 'block';
-        noMapMsg.style.display = 'none';
-        badge.style.display = 'block';
-      } else {
-        img.style.display = 'none';
-        noMapMsg.style.display = 'block';
-        badge.style.display = 'none';
-      }
-    }
-
-    function handleBgUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        uploadedBgBase64 = e.target.result;
-        applyBackground(uploadedBgBase64);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function applyBackground(src) {
-      const video = document.getElementById('mediaBackgroundVideo');
-      const img = document.getElementById('mediaBackgroundImage');
+    function applyPlayerMedia(src) {
+      const video = document.getElementById('dedicatedVideo');
+      const img = document.getElementById('dedicatedImage');
       if (!src) return;
 
-      const isImg = src.startsWith("data:image/") || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
+      const isImg = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
       if (isImg) {
         video.style.display = 'none';
+        video.pause();
         img.style.display = 'block';
         img.src = src;
       } else {
         img.style.display = 'none';
         video.style.display = 'block';
         video.src = src;
+        video.play().catch(()=>{});
+      }
+    }
+
+    // Toggle Sunet Video ON / OFF
+    function toggleVideoAudio() {
+      const video = document.getElementById('dedicatedVideo');
+      const btn = document.getElementById('btnToggleAudio');
+      if (video.muted) {
+        video.muted = false;
+        btn.innerText = "🔊 SUNET ACTIV";
+        btn.classList.add("active-sound");
+      } else {
+        video.muted = true;
+        btn.innerText = "🔇 SUNET OPRIT";
+        btn.classList.remove("active-sound");
+      }
+    }
+
+    // UPLOAD DIRECT SCHIȚĂ SALĂ
+    function handleSalaUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      uploadedSalaBlobUrl = URL.createObjectURL(file);
+      applySalaImage(uploadedSalaBlobUrl);
+    }
+
+    function applySalaImage(src) {
+      const img = document.getElementById('salaImg');
+      const noMapMsg = document.getElementById('noMapMsg');
+      if (src && src.trim() !== "") {
+        img.src = src;
+        img.style.display = 'block';
+        noMapMsg.style.display = 'none';
+      } else {
+        img.style.display = 'none';
+        noMapMsg.style.display = 'block';
       }
     }
 
     function saveConfig() {
-      const manualSala = document.getElementById('cfgSalaImg').value.trim();
-      const finalSala = uploadedSalaBase64 || manualSala;
-
-      const manualBg = document.getElementById('cfgMediaBg').value.trim();
-      const finalBg = uploadedBgBase64 || manualBg;
+      const finalPlayer = uploadedPlayerBlobUrl || document.getElementById('cfgPlayerMedia').value.trim();
+      const finalSala = uploadedSalaBlobUrl || document.getElementById('cfgSalaImg').value.trim();
 
       const cfg = {
         title: document.getElementById('cfgTitle').value,
-        mediaBg: finalBg,
+        playerMedia: finalPlayer,
         salaImg: finalSala,
         cloudLink: document.getElementById('cfgCloudLink').value,
         guestRaw: document.getElementById('cfgGuestList').value
       };
 
       try {
-        localStorage.setItem('kiosk_config', JSON.stringify(cfg));
-      } catch (e) {
-        alert("Atenție: Imaginea încărcată este mare și se păstrează pe durata sesiunii curente.");
-      }
+        localStorage.setItem('kiosk_config_v2', JSON.stringify(cfg));
+      } catch(e) {}
 
       loadSavedConfig();
       closeAdminModal();
@@ -466,7 +484,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     function saveStatus() {
       const statusMap = {};
       guests.forEach(g => { statusMap[g.name] = g.arrived; });
-      localStorage.setItem('kiosk_status', JSON.stringify(statusMap));
+      localStorage.setItem('kiosk_status_v2', JSON.stringify(statusMap));
     }
 
     function renderQRCode(url) {
@@ -474,13 +492,14 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       qrContainer.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
         new QRCode(qrContainer, {
-          text: url || 'https://drive.google.com', width: 130, height: 130,
+          text: url || 'https://drive.google.com', width: 95, height: 95,
           colorDark: "#000000", colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
+          correctLevel: QRCode.CorrectLevel.M
         });
       }
     }
 
+    // Căutare Tastatură
     function pressKey(char) {
       const input = document.getElementById('searchInput');
       input.value += char;
@@ -498,7 +517,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     function clearSearch() {
       document.getElementById('searchInput').value = '';
       currentSelectedIndex = -1;
-      document.getElementById('resName').innerText = 'Tastați numele pe tastatură';
+      document.getElementById('resName').innerText = 'Tastați numele dvs. pe tastatură';
       document.getElementById('resTable').innerText = 'MASA: ---';
       document.getElementById('resZone').innerText = 'Zona: ---';
       document.getElementById('btnCheckIn').style.display = 'none';
@@ -583,14 +602,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     function triggerAutoReset() {
       if (autoResetTimer) clearTimeout(autoResetTimer);
       autoResetTimer = setTimeout(clearSearch, 14000);
-    }
-
-    function manualSwitchToVideoBooth() {
-      document.getElementById('transitionModal').style.display = 'flex';
-    }
-
-    function launchVideoBooth() {
-      window.location.href = "videobootj.html";
     }
 
     function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
