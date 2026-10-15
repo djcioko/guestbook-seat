@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EventKiosk - Find My Seat & VideoBooth</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --primary: #ffd700;
+      --accent: #00ffcc;
+      --bg: #0a0a0c;
+      --card-bg: rgba(20, 22, 28, 0.94);
+      --red: #e63946;
+      --green: #2ecc71;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: #fff; overflow: hidden; width: 100vw; height: 100vh; position: relative; }
+
+    /* Fundal Media (Video sau Foto) */
+    #mediaBackgroundVideo {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 0; opacity: 0.38; filter: saturate(1.2);
+    }
+    #mediaBackgroundImage {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 0; opacity: 0.38; filter: saturate(1.2); display: none;
+    }
+    .overlay-backdrop {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, rgba(10,10,12,0.3) 0%, rgba(10,10,12,0.92) 100%);
+      z-index: 1; pointer-events: none;
+    }
+
+    #kioskApp {
+      position: relative; z-index: 2; width: 100%; height: 100%;
+      display: flex; flex-direction: column; padding: 14px 20px;
+    }
+
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--card-bg); padding: 12px 22px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+    }
+    .event-title { font-size: 1.45rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+    .stats-panel { display: flex; gap: 12px; font-size: 1.05rem; font-weight: 700; }
+    .badge { padding: 5px 14px; border-radius: 20px; }
+    .badge-arrived { background: rgba(46, 204, 113, 0.2); color: var(--green); border: 1px solid var(--green); }
+    .badge-pending { background: rgba(230, 57, 70, 0.2); color: var(--red); border: 1px solid var(--red); }
+    .badge-total { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+
+    .kiosk-body {
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px;
+      flex: 1; margin: 12px 0; min-height: 0;
+    }
+
+    .search-section { display: flex; flex-direction: column; height: 100%; }
+    .search-input {
+      width: 100%; padding: 14px 18px; font-size: 1.4rem; font-weight: 700;
+      border-radius: 12px; border: 2px solid var(--primary); background: rgba(15,15,18,0.95);
+      color: #fff; outline: none; box-shadow: 0 0 14px rgba(255, 215, 0, 0.2);
+    }
+
+    .result-card {
+      background: var(--card-bg); border-radius: 14px; padding: 14px 16px;
+      border: 1px solid rgba(255,215,0,0.35); margin-top: 10px; display: flex; flex-direction: column;
+    }
+    .res-name { font-size: 1.35rem; font-weight: 700; }
+    .res-table { font-size: 2.1rem; font-weight: 900; color: var(--primary); margin: 3px 0; }
+    .res-zone { font-size: 1.05rem; color: var(--accent); }
+    .res-teaser {
+      margin-top: 8px; font-size: 0.9rem; color: #fff; background: rgba(230, 57, 70, 0.18);
+      padding: 6px 12px; border-radius: 8px; border-left: 4px solid var(--red);
+    }
+    .btn-checkin {
+      margin-top: 10px; padding: 12px; font-size: 1.15rem; font-weight: 800;
+      background: var(--green); color: #000; border: none; border-radius: 10px;
+      cursor: pointer; display: none; text-transform: uppercase;
+    }
+    .btn-checkin:disabled { background: #444 !important; color: #aaa; cursor: default; }
+
+    .matches-list {
+      margin-top: 8px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.4);
+      border-radius: 10px; display: none; border: 1px solid #333;
+    }
+    .match-item {
+      padding: 8px 12px; border-bottom: 1px solid #282828; cursor: pointer; font-size: 1rem;
+    }
+    .match-item:hover { background: rgba(255,215,0,0.15); }
+    .match-item .status { float: right; font-size: 0.82rem; opacity: 0.8; }
+
+    .keyboard { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
+    .kb-row { display: flex; gap: 5px; justify-content: center; }
+    .key-btn {
+      flex: 1; height: 48px; font-size: 1.15rem; font-weight: 800; border: none;
+      border-radius: 9px; background: #232730; color: #fff; cursor: pointer;
+      box-shadow: 0 3px 0 #111;
+    }
+    .key-btn:active { background: var(--primary); color: #000; transform: translateY(2px); }
+    .key-btn.wide { flex: 2.2; background: #343a40; font-size: 0.95rem; }
+    .key-btn.back { background: #b71c1c; flex: 1.6; }
+
+    .side-section {
+      background: var(--card-bg); border-radius: 14px; padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
+      align-items: center; text-align: center; justify-content: space-between;
+    }
+    #qrcode { background: #fff; padding: 8px; border-radius: 10px; margin: 6px 0; }
+    .qr-text { font-size: 0.9rem; font-weight: 600; color: #bbb; }
+
+    .sala-box {
+      width: 100%; flex: 1; margin-top: 10px; border-radius: 12px;
+      background: #111419; border: 2px dashed rgba(255,215,0,0.4);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; position: relative; overflow: hidden;
+    }
+    #salaImg { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .sala-badge-info {
+      position: absolute; bottom: 8px; background: rgba(0,0,0,0.75);
+      color: var(--primary); padding: 4px 10px; border-radius: 6px;
+      font-size: 0.8rem; font-weight: 700;
+    }
+    .no-map-msg { padding: 15px; color: #888; font-size: 0.9rem; line-height: 1.4; }
+
+    .admin-bar {
+      position: absolute; bottom: 6px; left: 14px; z-index: 10;
+      display: flex; gap: 8px; opacity: 0.35; transition: opacity 0.3s;
+    }
+    .admin-bar:hover { opacity: 1; }
+    .btn-admin {
+      background: #2b2d42; color: #fff; border: none; padding: 7px 14px;
+      border-radius: 8px; font-size: 0.82rem; cursor: pointer; font-weight: 700;
+    }
+
+    #adminModal, #transitionModal {
+      display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 99; backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    .admin-content {
+      background: #181a20; border: 1px solid var(--primary); border-radius: 16px;
+      padding: 22px; width: 92%; max-width: 720px; max-height: 90vh; overflow-y: auto;
+    }
+    .upload-box {
+      background: #222630; border: 1px dashed #555; padding: 10px; border-radius: 8px; margin-top: 4px;
+    }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #bbb; margin-bottom: 3px; font-weight: 700; }
+    .form-group input[type="text"], .form-group input[type="number"], .form-group textarea {
+      width: 100%; padding: 8px 10px; border-radius: 8px; background: #0e1014;
+      border: 1px solid #333; color: #fff; font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Media Background (Video sau Imagine) -->
+  <video id="mediaBackgroundVideo" autoplay loop muted playsinline src="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4"></video>
+  <img id="mediaBackgroundImage" alt="Fundal">
+  <div class="overlay-backdrop"></div>
+
+  <!-- Kiosk App -->
+  <div id="kioskApp">
+    <header>
+      <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
+      <div class="stats-panel">
+        <div class="badge badge-arrived" id="statArrived">SOSIȚI: 0</div>
+        <div class="badge badge-pending" id="statRemaining">RĂMAȘI: 0</div>
+        <div class="badge badge-total" id="statTotal">TOTAL: 0</div>
+      </div>
+    </header>
+
+    <div class="kiosk-body">
+      <!-- Stânga: Căutare + Rezultat + Tastatură -->
+      <div class="search-section">
+        <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." readonly>
+
+        <div class="result-card">
+          <div class="res-name" id="resName">Tastați numele pe tastatură</div>
+          <div class="res-table" id="resTable">MASA: ---</div>
+          <div class="res-zone" id="resZone">Zona: ---</div>
+          <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
+          <div class="res-teaser" id="resTeaser">
+            🎥 Atenție: Acest ecran devine <b>VideoBooth</b> după primirea invitaților!
+          </div>
+        </div>
+
+        <div class="matches-list" id="matchesList"></div>
+
+        <!-- Tastatură tactilă -->
+        <div class="keyboard">
+          <div class="kb-row">
+            <button class="key-btn" onclick="pressKey('A')">A</button>
+            <button class="key-btn" onclick="pressKey('Ă')">Ă</button>
+            <button class="key-btn" onclick="pressKey('Â')">Â</button>
+            <button class="key-btn" onclick="pressKey('B')">B</button>
+            <button class="key-btn" onclick="pressKey('C')">C</button>
+            <button class="key-btn" onclick="pressKey('D')">D</button>
+            <button class="key-btn" onclick="pressKey('E')">E</button>
+            <button class="key-btn" onclick="pressKey('F')">F</button>
+            <button class="key-btn" onclick="pressKey('G')">G</button>
+          </div>
+          <div class="kb-row">
+            <button class="key-btn" onclick="pressKey('H')">H</button>
+            <button class="key-btn" onclick="pressKey('I')">I</button>
+            <button class="key-btn" onclick="pressKey('Î')">Î</button>
+            <button class="key-btn" onclick="pressKey('J')">J</button>
+            <button class="key-btn" onclick="pressKey('K')">K</button>
+            <button class="key-btn" onclick="pressKey('L')">L</button>
+            <button class="key-btn" onclick="pressKey('M')">M</button>
+            <button class="key-btn" onclick="pressKey('N')">N</button>
+            <button class="key-btn" onclick="pressKey('O')">O</button>
+          </div>
+          <div class="kb-row">
+            <button class="key-btn" onclick="pressKey('P')">P</button>
+            <button class="key-btn" onclick="pressKey('R')">R</button>
+            <button class="key-btn" onclick="pressKey('S')">S</button>
+            <button class="key-btn" onclick="pressKey('Ș')">Ș</button>
+            <button class="key-btn" onclick="pressKey('T')">T</button>
+            <button class="key-btn" onclick="pressKey('Ț')">Ț</button>
+            <button class="key-btn" onclick="pressKey('U')">U</button>
+            <button class="key-btn" onclick="pressKey('V')">V</button>
+            <button class="key-btn" onclick="pressKey('Z')">Z</button>
+          </div>
+          <div class="kb-row">
+            <button class="key-btn wide" onclick="pressKey(' ')">SPAȚIU</button>
+            <button class="key-btn back" onclick="backspaceKey()">⌫ ȘTERGE</button>
+            <button class="key-btn wide" onclick="clearSearch()">GOLIȚI</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dreapta: QR + Schița Sălii -->
+      <div class="side-section">
+        <div style="font-weight: 800; color: var(--primary);">SCAN PE MOBIL</div>
+        <div id="qrcode"></div>
+        <div class="qr-text">Scanați pentru lista și schița pe telefon</div>
+
+        <!-- Container Afișare Schiță Sală -->
+        <div class="sala-box" id="salaBox">
+          <img id="salaImg" src="" alt="Schiță Sală Restaurant" style="display:none;">
+          <div class="no-map-msg" id="noMapMsg">
+            🗺 <b>Fără Schiță Încărcată</b><br>
+            Mergi în <i>⚙ Panou Control & Upload</i> și alege poza schiței din tabletă.
+          </div>
+          <div class="sala-badge-info" id="salaBadgeInfo" style="display:none;">SCHIȚĂ RESTAURANT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Butoane Control (Stânga Jos) -->
+  <div class="admin-bar">
+    <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Upload</button>
+    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+    <button class="btn-admin" onclick="manualSwitchToVideoBooth()">🔴 VideoBooth</button>
+  </div>
+
+  <!-- Modal Admin / Setări / Upload DIRECT din Tabletă -->
+  <div id="adminModal">
+    <div class="admin-content">
+      <h2 style="color:var(--primary); margin-bottom: 12px;">⚙ Panou Control & Încărcare Fișiere</h2>
+
+      <div class="form-group">
+        <label>Titlu Eveniment (Nume Miri / Botez):</label>
+        <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
+      </div>
+
+      <!-- 1. UPLOAD SCHIȚĂ SALĂ -->
+      <div class="form-group">
+        <label>🗺 1. Schiță Sală Restaurant (Alege poză din tabletă sau fă poză cu camera):</label>
+        <div class="upload-box">
+          <input type="file" id="fileSalaInput" accept="image/*" onchange="handleSalaUpload(event)">
+          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau link extern de pe net:</div>
+          <input type="text" id="cfgSalaImg" placeholder="https://..." style="margin-top:4px;">
+        </div>
+      </div>
+
+      <!-- 2. UPLOAD FUNDAL VIDEO SAU FOTO -->
+      <div class="form-group">
+        <label>🎬 2. Fundal Video Loop sau Poză / GIF (Alege din tabletă):</label>
+        <div class="upload-box">
+          <input type="file" id="fileBgInput" accept="video/mp4,image/*" onchange="handleBgUpload(event)">
+          <div style="font-size:0.8rem; color:#aaa; margin-top:4px;">Sau link video/foto MP4/GIF existent:</div>
+          <input type="text" id="cfgMediaBg" value="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4" style="margin-top:4px;">
+        </div>
+      </div>
+
+      <!-- 3. LINK CLOUD -->
+      <div class="form-group">
+        <label>🔗 Link Folder Cloud (Google Drive / Dropbox pentru Cod QR):</label>
+        <input type="text" id="cfgCloudLink" value="https://drive.google.com">
+      </div>
+
+      <!-- 4. LISTĂ INVITAȚI -->
+      <div class="form-group">
+        <label>📋 Listă Invitați (Copy-Paste din textul extras de Gemini):<br>
+        <small style="color:#888;">Format: <b>Nume | Masa | Zona</b> (câte unul pe rând)</small></label>
+        <textarea id="cfgGuestList" rows="6">Popescu Ion | Masa 1 | Lângă ring, stânga
+Popescu Elena | Masa 1 | Lângă ring, stânga
+Ionescu Andrei | Masa 3 | Lângă bar
+Radu Maria | Masa 2 | În fața scenei
+Stan George | Masa 4 | Lângă geamuri
+Vasilescu Dan | Masa 2 | În fața scenei</textarea>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; margin-top: 14px;">
+        <button class="btn-admin" style="background:var(--green); font-size:1rem; padding:10px 22px;" onclick="saveConfig()">✔ Salvează Setările</button>
+        <button class="btn-admin" style="background:#555; font-size:1rem; padding:10px 22px;" onclick="closeAdminModal()">Închide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tranziție VideoBooth -->
+  <div id="transitionModal">
+    <h1 style="color:var(--primary); font-size: 2.5rem; margin-bottom: 12px;">SALA ESTE COMPLETĂ! 🎉</h1>
+    <p style="font-size: 1.25rem; max-width: 650px; line-height: 1.6; color: #ddd;">
+      Invitații au sosit. Tableta trece acum în modul <b>VideoBooth Interactiv</b> pentru mesaje video către miri!
+    </p>
+    <button class="btn-admin" style="margin-top:20px; font-size:1.3rem; padding:16px 32px; background:var(--red); border-radius:50px;" onclick="launchVideoBooth()">🔴 PORNEȘTE VIDEOBOOTH</button>
+  </div>
+
+  <script>
+    let guests = [];
+    let currentSelectedIndex = -1;
+    let autoResetTimer = null;
+    let uploadedSalaBase64 = "";
+    let uploadedBgBase64 = "";
+
+    window.onload = function() {
+      loadSavedConfig();
+    };
+
+    function loadSavedConfig() {
+      const saved = localStorage.getItem('kiosk_config');
+      const savedStatus = localStorage.getItem('kiosk_status');
+      let statusMap = {};
+      if (savedStatus) {
+        try { statusMap = JSON.parse(savedStatus); } catch(e) {}
+      }
+
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        document.getElementById('dispEventTitle').innerText = cfg.title;
+        document.getElementById('cfgTitle').value = cfg.title;
+        document.getElementById('cfgCloudLink').value = cfg.cloudLink;
+        document.getElementById('cfgGuestList').value = cfg.guestRaw;
+
+        if (cfg.salaImg) {
+          applySalaImage(cfg.salaImg);
+          document.getElementById('cfgSalaImg').value = cfg.salaImg.startsWith("data:") ? "" : cfg.salaImg;
+        }
+
+        if (cfg.mediaBg) {
+          applyBackground(cfg.mediaBg);
+          document.getElementById('cfgMediaBg').value = cfg.mediaBg.startsWith("data:") ? "" : cfg.mediaBg;
+        }
+
+        parseGuests(cfg.guestRaw, statusMap);
+        renderQRCode(cfg.cloudLink);
+      } else {
+        parseGuests(document.getElementById('cfgGuestList').value, {});
+        applyBackground(document.getElementById('cfgMediaBg').value);
+        renderQRCode(document.getElementById('cfgCloudLink').value);
+      }
+      updateStats();
+    }
+
+    function handleSalaUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedSalaBase64 = e.target.result;
+        applySalaImage(uploadedSalaBase64);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applySalaImage(src) {
+      const img = document.getElementById('salaImg');
+      const noMapMsg = document.getElementById('noMapMsg');
+      const badge = document.getElementById('salaBadgeInfo');
+      if (src && src.trim() !== "") {
+        img.src = src;
+        img.style.display = 'block';
+        noMapMsg.style.display = 'none';
+        badge.style.display = 'block';
+      } else {
+        img.style.display = 'none';
+        noMapMsg.style.display = 'block';
+        badge.style.display = 'none';
+      }
+    }
+
+    function handleBgUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedBgBase64 = e.target.result;
+        applyBackground(uploadedBgBase64);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyBackground(src) {
+      const video = document.getElementById('mediaBackgroundVideo');
+      const img = document.getElementById('mediaBackgroundImage');
+      if (!src) return;
+
+      const isImg = src.startsWith("data:image/") || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
+      if (isImg) {
+        video.style.display = 'none';
+        img.style.display = 'block';
+        img.src = src;
+      } else {
+        img.style.display = 'none';
+        video.style.display = 'block';
+        video.src = src;
+      }
+    }
+
+    function saveConfig() {
+      const manualSala = document.getElementById('cfgSalaImg').value.trim();
+      const finalSala = uploadedSalaBase64 || manualSala;
+
+      const manualBg = document.getElementById('cfgMediaBg').value.trim();
+      const finalBg = uploadedBgBase64 || manualBg;
+
+      const cfg = {
+        title: document.getElementById('cfgTitle').value,
+        mediaBg: finalBg,
+        salaImg: finalSala,
+        cloudLink: document.getElementById('cfgCloudLink').value,
+        guestRaw: document.getElementById('cfgGuestList').value
+      };
+
+      try {
+        localStorage.setItem('kiosk_config', JSON.stringify(cfg));
+      } catch (e) {
+        alert("Atenție: Imaginea încărcată este mare și se păstrează pe durata sesiunii curente.");
+      }
+
+      loadSavedConfig();
+      closeAdminModal();
+    }
+
+    function parseGuests(rawText, statusMap) {
+      guests = [];
+      const lines = rawText.split('\n');
+      lines.forEach(line => {
+        const parts = line.split('|').map(p => p.trim());
+        if (parts.length >= 2 && parts[0] !== '') {
+          const name = parts[0];
+          guests.push({
+            name: name,
+            table: parts[1],
+            zone: parts[2] || 'Sală Principală',
+            arrived: statusMap[name] === true
+          });
+        }
+      });
+    }
+
+    function saveStatus() {
+      const statusMap = {};
+      guests.forEach(g => { statusMap[g.name] = g.arrived; });
+      localStorage.setItem('kiosk_status', JSON.stringify(statusMap));
+    }
+
+    function renderQRCode(url) {
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: url || 'https://drive.google.com', width: 130, height: 130,
+          colorDark: "#000000", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    }
+
+    function pressKey(char) {
+      const input = document.getElementById('searchInput');
+      input.value += char;
+      searchGuest(input.value);
+      triggerAutoReset();
+    }
+
+    function backspaceKey() {
+      const input = document.getElementById('searchInput');
+      input.value = input.value.slice(0, -1);
+      searchGuest(input.value);
+      triggerAutoReset();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      currentSelectedIndex = -1;
+      document.getElementById('resName').innerText = 'Tastați numele pe tastatură';
+      document.getElementById('resTable').innerText = 'MASA: ---';
+      document.getElementById('resZone').innerText = 'Zona: ---';
+      document.getElementById('btnCheckIn').style.display = 'none';
+      document.getElementById('matchesList').style.display = 'none';
+      document.getElementById('matchesList').innerHTML = '';
+    }
+
+    function searchGuest(query) {
+      query = query.trim().toUpperCase();
+      const listEl = document.getElementById('matchesList');
+      listEl.innerHTML = '';
+      listEl.style.display = 'none';
+
+      if (!query) { clearSearch(); return; }
+
+      const matches = guests
+        .map((g, idx) => ({ ...g, idx }))
+        .filter(g => g.name.toUpperCase().includes(query));
+
+      if (matches.length === 0) {
+        document.getElementById('resName').innerText = 'Numele nu a fost găsit...';
+        document.getElementById('resTable').innerText = 'MASA: ---';
+        document.getElementById('resZone').innerText = 'Verificați literele sau întrebați la recepție';
+        document.getElementById('btnCheckIn').style.display = 'none';
+        return;
+      }
+
+      if (matches.length === 1) {
+        selectGuest(matches[0].idx);
+      } else {
+        listEl.style.display = 'block';
+        matches.forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'match-item';
+          div.innerHTML = `${m.name} <span class="status">${m.arrived ? '✓ Sosit' : '— Așteptare'}</span>`;
+          div.onclick = () => selectGuest(m.idx);
+          listEl.appendChild(div);
+        });
+        selectGuest(matches[0].idx);
+      }
+    }
+
+    function selectGuest(idx) {
+      currentSelectedIndex = idx;
+      const g = guests[idx];
+      document.getElementById('resName').innerText = g.name;
+      document.getElementById('resTable').innerText = g.table;
+      document.getElementById('resZone').innerText = 'Zona: ' + g.zone;
+
+      const btn = document.getElementById('btnCheckIn');
+      btn.style.display = 'block';
+      if (g.arrived) {
+        btn.innerText = '✓ DEJA CONFIRMAT';
+        btn.disabled = true;
+      } else {
+        btn.innerText = '✔ CONFIRMĂ PREZENȚA (AM SOSIT)';
+        btn.disabled = false;
+      }
+    }
+
+    function confirmCheckIn() {
+      if (currentSelectedIndex !== -1) {
+        guests[currentSelectedIndex].arrived = true;
+        saveStatus();
+        updateStats();
+        const btn = document.getElementById('btnCheckIn');
+        btn.innerText = '✓ BINE AȚI VENIT!';
+        btn.disabled = true;
+        setTimeout(clearSearch, 3500);
+      }
+    }
+
+    function updateStats() {
+      const arrived = guests.filter(g => g.arrived).length;
+      const total = guests.length;
+      const remaining = total - arrived;
+      document.getElementById('statArrived').innerText = `SOSIȚI: ${arrived}`;
+      document.getElementById('statRemaining').innerText = `RĂMAȘI: ${remaining}`;
+      document.getElementById('statTotal').innerText = `TOTAL: ${total}`;
+    }
+
+    function triggerAutoReset() {
+      if (autoResetTimer) clearTimeout(autoResetTimer);
+      autoResetTimer = setTimeout(clearSearch, 14000);
+    }
+
+    function manualSwitchToVideoBooth() {
+      document.getElementById('transitionModal').style.display = 'flex';
+    }
+
+    function launchVideoBooth() {
+      window.location.href = "videobootj.html";
+    }
+
+    function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
+    function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
