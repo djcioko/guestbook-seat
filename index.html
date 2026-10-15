@@ -163,7 +163,7 @@
     }
     .qr-mini-label { font-size: 0.68rem; color: var(--primary); font-weight: 800; margin-top: 4px; }
 
-    /* LISTA REZULTATE CU SCROLL INTERN */
+    /* LISTA REZULTATE CU SCROLL */
     .matches-container {
       position: relative;
       flex: 0 0 auto;
@@ -185,7 +185,7 @@
     .match-item:hover, .match-item.active-item { background: rgba(255,215,0,0.22); color: #fff; }
     .match-item .status { float: right; font-size: 0.8rem; opacity: 0.85; }
 
-    /* TASTATURĂ FĂRĂ DIACRITICE (CURATĂ, MARE) */
+    /* TASTATURĂ FĂRĂ DIACRITICE */
     .keyboard {
       flex: 1 1 auto;
       display: flex;
@@ -197,7 +197,7 @@
     .kb-row { display: flex; gap: 5px; justify-content: center; width: 100%; flex: 1; }
     .key-btn {
       flex: 1;
-      min-height: 42px;
+      min-height: 40px;
       font-size: 1.15rem;
       font-weight: 800;
       border: none;
@@ -214,7 +214,7 @@
     .key-btn.wide { flex: 2; background: #343a48; font-size: 0.9rem; }
     .key-btn.back { background: #b71c1c; flex: 1.6; font-size: 0.95rem; }
 
-    /* DREAPTA: PLAYER + SCHIȚĂ (50% / 50% FIX) */
+    /* DREAPTA: SUS VIDEO / JOS SCHIȚĂ (50% / 50% FIXE ȘI INDEPENDENTE) */
     .right-section {
       display: flex;
       flex-direction: column;
@@ -232,6 +232,9 @@
       border: 1px solid rgba(255,215,0,0.3);
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .video-header-bar {
       position: absolute;
@@ -259,6 +262,8 @@
     .player-media-wrap {
       width: 100%;
       height: 100%;
+      position: absolute;
+      top: 0; left: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -295,6 +300,7 @@
       height: 100%;
       object-fit: contain;
       display: none;
+      z-index: 1;
     }
     .no-map-msg {
       padding: 12px;
@@ -315,7 +321,7 @@
       z-index: 2;
     }
 
-    /* BARĂ ADMIN JOS */
+    /* ADMIN BAR & MODAL */
     .admin-bar {
       position: fixed;
       bottom: 6px;
@@ -338,7 +344,6 @@
       font-weight: 700;
     }
 
-    /* MODAL ADMIN */
     #adminModal {
       display: none;
       position: fixed;
@@ -399,7 +404,6 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." autocomplete="off">
 
         <div class="result-qr-row">
-          <!-- Card Rezultat -->
           <div class="result-card">
             <div class="res-name" id="resName">Tastați numele dvs. pe tastatură</div>
             <div class="res-table" id="resTable">MASA: ---</div>
@@ -407,7 +411,6 @@
             <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
           </div>
 
-          <!-- QR Code -->
           <div class="qr-card-left">
             <div id="qrcode"></div>
             <div class="qr-mini-label">SCAN PE MOBIL</div>
@@ -420,7 +423,6 @@
 
         <!-- TASTATURĂ FĂRĂ DIACRITICE -->
         <div class="keyboard">
-          <!-- Rândul 1 (A - I) -->
           <div class="kb-row">
             <button class="key-btn" onclick="pressKey('A')">A</button>
             <button class="key-btn" onclick="pressKey('B')">B</button>
@@ -432,7 +434,6 @@
             <button class="key-btn" onclick="pressKey('H')">H</button>
             <button class="key-btn" onclick="pressKey('I')">I</button>
           </div>
-          <!-- Rândul 2 (J - R) -->
           <div class="kb-row">
             <button class="key-btn" onclick="pressKey('J')">J</button>
             <button class="key-btn" onclick="pressKey('K')">K</button>
@@ -444,7 +445,6 @@
             <button class="key-btn" onclick="pressKey('Q')">Q</button>
             <button class="key-btn" onclick="pressKey('R')">R</button>
           </div>
-          <!-- Rândul 3 (S - Z) -->
           <div class="kb-row">
             <button class="key-btn" onclick="pressKey('S')">S</button>
             <button class="key-btn" onclick="pressKey('T')">T</button>
@@ -455,7 +455,6 @@
             <button class="key-btn" onclick="pressKey('Y')">Y</button>
             <button class="key-btn" onclick="pressKey('Z')">Z</button>
           </div>
-          <!-- Rândul 4 (Comenzi) -->
           <div class="kb-row">
             <button class="key-btn wide" onclick="pressKey(' ')">SPAȚIU</button>
             <button class="key-btn back" onclick="backspaceKey()">⌫ ȘTERGE</button>
@@ -464,8 +463,9 @@
         </div>
       </div>
 
-      <!-- PARTEA DREAPTĂ (Cadre Fixe) -->
+      <!-- PARTEA DREAPTĂ (Cadre Fixe 50% - 50%) -->
       <div class="right-section">
+        <!-- SUS: VIDEO LOOP -->
         <div class="video-card">
           <div class="video-header-bar">
             <div class="video-title-tag">MOMENTE SPECIALE</div>
@@ -477,9 +477,10 @@
           </div>
         </div>
 
+        <!-- JOS: SCHIȚĂ SALĂ -->
         <div class="map-card">
           <div class="map-badge-tag">🗺 SCHIȚĂ SALĂ</div>
-          <img id="salaImg" src="" alt="Schiță Restaurant">
+          <img id="salaImg" src="" alt="Schiță Sală Restaurant">
           <div class="no-map-msg" id="noMapMsg">
             Fără schiță încărcată.<br>
             Apasă <b>⚙ Panou Control</b> și alege poza schiței.
@@ -489,7 +490,7 @@
     </div>
   </div>
 
-  <!-- Butoane Admin -->
+  <!-- Butoane Bară Admin -->
   <div class="admin-bar">
     <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
     <button class="btn-admin" onclick="toggleFullScreen()">⛶ Ecran Complet</button>
@@ -505,8 +506,9 @@
         <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
       </div>
 
+      <!-- Video / Poza de sus -->
       <div class="form-group">
-        <label>🎬 Video Loop sau Poză (Alege din dispozitiv):</label>
+        <label>🎬 Video sau Poză Header (Alege din tabletă/laptop):</label>
         <div class="upload-box">
           <input type="file" id="filePlayerInput" accept="video/*,image/*" onchange="handlePlayerUpload(event)">
           <div style="font-size:0.75rem; color:#aaa; margin-top:4px;">Sau URL extern:</div>
@@ -514,11 +516,12 @@
         </div>
       </div>
 
+      <!-- Schița de jos -->
       <div class="form-group">
-        <label>🗺 Poză Schiță Sală (Alege din dispozitiv):</label>
+        <label>🗺 Poză Schiță Sală (Alege din tabletă/laptop):</label>
         <div class="upload-box">
           <input type="file" id="fileSalaInput" accept="image/*" onchange="handleSalaUpload(event)">
-          <div style="font-size:0.75rem; color:#aaa; margin-top:4px;">Sau fișier local / URL:</div>
+          <div style="font-size:0.75rem; color:#aaa; margin-top:4px;">Sau link extern / fișier:</div>
           <input type="text" id="cfgSalaImg" placeholder="schita.jpg" style="margin-top:4px;">
         </div>
       </div>
@@ -549,10 +552,11 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     let guests = [];
     let currentSelectedIndex = -1;
     let autoResetTimer = null;
-    let tempPlayerBlob = "";
-    let tempSalaBlob = "";
 
-    // Eliminare completă a diacriticelor pentru căutare flexibilă
+    // Stocare separată pentru sursele media curente
+    let activePlayerMedia = "";
+    let activeSalaImage = "";
+
     function cleanText(str) {
       if (!str) return "";
       return str.normalize("NFD")
@@ -564,7 +568,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     }
 
     window.onload = function() {
-      // Ascultă direct tastarea fizică de la laptop/tabletă
       document.getElementById('searchInput').addEventListener('input', function(e) {
         searchGuest(e.target.value);
         triggerAutoReset();
@@ -573,8 +576,8 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     };
 
     function loadSavedConfig() {
-      const savedCfg = localStorage.getItem('kiosk_config_v4');
-      const savedStatus = localStorage.getItem('kiosk_status_v4');
+      const savedCfg = localStorage.getItem('kiosk_config_v5');
+      const savedStatus = localStorage.getItem('kiosk_status_v5');
       let statusMap = {};
       if (savedStatus) {
         try { statusMap = JSON.parse(savedStatus); } catch(e) {}
@@ -586,27 +589,46 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         document.getElementById('cfgTitle').value = cfg.title;
         document.getElementById('cfgCloudLink').value = cfg.cloudLink || 'https://drive.google.com';
         document.getElementById('cfgGuestList').value = cfg.guestRaw;
-        document.getElementById('cfgPlayerMedia').value = cfg.playerMedia;
-        document.getElementById('cfgSalaImg').value = cfg.salaImg;
+        
+        activePlayerMedia = cfg.playerMedia || "https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4";
+        activeSalaImage = cfg.salaImg || "";
 
-        applyPlayerMedia(cfg.playerMedia);
-        applySalaImage(cfg.salaImg);
+        document.getElementById('cfgPlayerMedia').value = activePlayerMedia.startsWith('data:') ? '[Fișier încărcat]' : activePlayerMedia;
+        document.getElementById('cfgSalaImg').value = activeSalaImage.startsWith('data:') ? '[Fișier încărcat]' : activeSalaImage;
+
+        applyPlayerMedia(activePlayerMedia);
+        applySalaImage(activeSalaImage);
         parseGuests(cfg.guestRaw, statusMap);
         renderQRCode(cfg.cloudLink);
       } else {
+        activePlayerMedia = document.getElementById('cfgPlayerMedia').value;
+        activeSalaImage = document.getElementById('cfgSalaImg').value;
         parseGuests(document.getElementById('cfgGuestList').value, {});
-        applyPlayerMedia(document.getElementById('cfgPlayerMedia').value);
-        applySalaImage(document.getElementById('cfgSalaImg').value);
+        applyPlayerMedia(activePlayerMedia);
+        applySalaImage(activeSalaImage);
         renderQRCode(document.getElementById('cfgCloudLink').value);
       }
       updateStats();
     }
 
+    // ÎNCĂRCARE VIDEO / IMAGINE SUS
     function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-      tempPlayerBlob = URL.createObjectURL(file);
-      applyPlayerMedia(tempPlayerBlob);
+
+      const isVideo = file.type.startsWith('video');
+      // Dacă este video se folosește un ObjectURL rapid; pentru imagini se salvează în memorie
+      if (isVideo) {
+        activePlayerMedia = URL.createObjectURL(file);
+        applyPlayerMedia(activePlayerMedia);
+      } else {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          activePlayerMedia = e.target.result;
+          applyPlayerMedia(activePlayerMedia);
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     function applyPlayerMedia(src) {
@@ -614,7 +636,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       const img = document.getElementById('dedicatedImage');
       if (!src) return;
 
-      const isImg = /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(src) || (src.startsWith('blob:') && !src.includes('video'));
+      const isImg = src.startsWith('data:image') || /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(src);
       if (isImg) {
         video.style.display = 'none';
         video.pause();
@@ -642,17 +664,23 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       }
     }
 
+    // ÎNCĂRCARE SCHIȚĂ JOS (Conversie directă Base64 ca să nu dispară niciodată)
     function handleSalaUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-      tempSalaBlob = URL.createObjectURL(file);
-      applySalaImage(tempSalaBlob);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        activeSalaImage = e.target.result;
+        applySalaImage(activeSalaImage);
+      };
+      reader.readAsDataURL(file);
     }
 
     function applySalaImage(src) {
       const img = document.getElementById('salaImg');
       const noMapMsg = document.getElementById('noMapMsg');
-      if (src && src.trim() !== "") {
+      if (src && src.trim() !== "" && src !== '[Fișier încărcat]') {
         img.src = src;
         img.style.display = 'block';
         noMapMsg.style.display = 'none';
@@ -663,22 +691,35 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     }
 
     function saveConfig() {
-      const finalPlayer = tempPlayerBlob || document.getElementById('cfgPlayerMedia').value.trim();
-      const finalSala = tempSalaBlob || document.getElementById('cfgSalaImg').value.trim();
+      // Păstrează sursele existente dacă utilizatorul nu a scris alt URL manual
+      const manualPlayer = document.getElementById('cfgPlayerMedia').value.trim();
+      const manualSala = document.getElementById('cfgSalaImg').value.trim();
+
+      if (manualPlayer !== '' && manualPlayer !== '[Fișier încărcat]') {
+        activePlayerMedia = manualPlayer;
+      }
+      if (manualSala !== '' && manualSala !== '[Fișier încărcat]') {
+        activeSalaImage = manualSala;
+      }
 
       const cfg = {
         title: document.getElementById('cfgTitle').value,
-        playerMedia: finalPlayer,
-        salaImg: finalSala,
+        playerMedia: activePlayerMedia,
+        salaImg: activeSalaImage,
         cloudLink: document.getElementById('cfgCloudLink').value,
         guestRaw: document.getElementById('cfgGuestList').value
       };
 
       try {
-        localStorage.setItem('kiosk_config_v4', JSON.stringify(cfg));
-      } catch(e) {}
+        localStorage.setItem('kiosk_config_v5', JSON.stringify(cfg));
+      } catch(e) {
+        console.warn("Storage plin, salvare fără fișiere mari în localStorage:", e);
+      }
 
-      loadSavedConfig();
+      applyPlayerMedia(activePlayerMedia);
+      applySalaImage(activeSalaImage);
+      parseGuests(cfg.guestRaw, {});
+      renderQRCode(cfg.cloudLink);
       closeAdminModal();
       clearSearch();
     }
@@ -711,7 +752,9 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     function saveStatus() {
       const statusMap = {};
       guests.forEach(g => { statusMap[g.name] = g.arrived; });
-      localStorage.setItem('kiosk_status_v4', JSON.stringify(statusMap));
+      try {
+        localStorage.setItem('kiosk_status_v5', JSON.stringify(statusMap));
+      } catch(e) {}
     }
 
     function renderQRCode(url) {
@@ -766,7 +809,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         return;
       }
 
-      // Căutare independentă de diacritice
       const matches = guests
         .map((g, idx) => ({ ...g, idx }))
         .filter(g => cleanText(g.name).includes(cleanQ));
