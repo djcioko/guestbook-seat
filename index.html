@@ -35,7 +35,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 10px 16px 14px 16px;
+      padding: 10px 16px 12px 16px;
       gap: 10px;
     }
 
@@ -66,7 +66,7 @@
     .badge-pending { background: rgba(230, 57, 70, 0.18); color: var(--red); border: 1px solid var(--red); }
     .badge-total { background: rgba(255, 255, 255, 0.1); color: #ddd; }
 
-    /* CORP PRINCIPAL: 2 COLOANE CU DIMENSIUNE STRICT BLOCATĂ */
+    /* CORP PRINCIPAL: DIMENSIUNI STRICT BLOCATE */
     .kiosk-body {
       flex: 1 1 0;
       min-height: 0;
@@ -75,7 +75,7 @@
       gap: 14px;
     }
 
-    /* COLOANA STÂNGA */
+    /* STÂNGA: CĂUTARE + REZULTAT + TASTATURĂ */
     .search-section {
       display: flex;
       flex-direction: column;
@@ -98,7 +98,6 @@
       box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
     }
 
-    /* ZONA REZULTAT + QR CODE */
     .result-qr-row {
       flex: 0 0 135px;
       height: 135px;
@@ -119,14 +118,14 @@
       min-width: 0;
     }
     .res-name { 
-      font-size: 1.15rem; 
+      font-size: 1.2rem; 
       font-weight: 700; 
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
     }
-    .res-table { font-size: 1.7rem; font-weight: 900; color: var(--primary); margin: 2px 0; }
-    .res-zone { font-size: 0.88rem; color: var(--accent); }
+    .res-table { font-size: 1.8rem; font-weight: 900; color: var(--primary); margin: 2px 0; }
+    .res-zone { font-size: 0.9rem; color: var(--accent); }
     .btn-checkin {
       margin-top: 6px;
       padding: 8px;
@@ -164,13 +163,13 @@
     }
     .qr-mini-label { font-size: 0.68rem; color: var(--primary); font-weight: 800; margin-top: 4px; }
 
-    /* LISTA MATCH-URI */
+    /* LISTA REZULTATE CU SCROLL INTERN */
     .matches-container {
       position: relative;
       flex: 0 0 auto;
     }
     .matches-list {
-      max-height: 85px;
+      max-height: 90px;
       overflow-y: auto;
       background: #14171f;
       border-radius: 8px;
@@ -178,28 +177,28 @@
       border: 1px solid #383e4d;
     }
     .match-item {
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-bottom: 1px solid #232733;
       cursor: pointer;
       font-size: 0.95rem;
     }
-    .match-item:hover, .match-item.active-item { background: rgba(255,215,0,0.18); }
-    .match-item .status { float: right; font-size: 0.8rem; opacity: 0.8; }
+    .match-item:hover, .match-item.active-item { background: rgba(255,215,0,0.22); color: #fff; }
+    .match-item .status { float: right; font-size: 0.8rem; opacity: 0.85; }
 
-    /* TASTATURĂ TACTILĂ */
+    /* TASTATURĂ FĂRĂ DIACRITICE (CURATĂ, MARE) */
     .keyboard {
       flex: 1 1 auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      gap: 4px;
+      gap: 5px;
       min-height: 0;
     }
-    .kb-row { display: flex; gap: 4px; justify-content: center; width: 100%; flex: 1; }
+    .kb-row { display: flex; gap: 5px; justify-content: center; width: 100%; flex: 1; }
     .key-btn {
       flex: 1;
-      min-height: 38px;
-      font-size: 1.05rem;
+      min-height: 42px;
+      font-size: 1.15rem;
       font-weight: 800;
       border: none;
       border-radius: 6px;
@@ -212,10 +211,10 @@
       box-shadow: 0 2px 0 #111;
     }
     .key-btn:active { background: var(--primary); color: #000; transform: translateY(1px); }
-    .key-btn.wide { flex: 2; background: #343a48; font-size: 0.85rem; }
-    .key-btn.back { background: #b71c1c; flex: 1.5; font-size: 0.9rem; }
+    .key-btn.wide { flex: 2; background: #343a48; font-size: 0.9rem; }
+    .key-btn.back { background: #b71c1c; flex: 1.6; font-size: 0.95rem; }
 
-    /* COLOANA DREAPTA (Media + Harta fixe 50% / 50%) */
+    /* DREAPTA: PLAYER + SCHIȚĂ (50% / 50% FIX) */
     .right-section {
       display: flex;
       flex-direction: column;
@@ -224,7 +223,6 @@
       min-height: 0;
     }
 
-    /* CARD 1: VIDEO/POZĂ LOOP */
     .video-card {
       flex: 1 1 50%;
       height: 50%;
@@ -279,7 +277,6 @@
       display: none;
     }
 
-    /* CARD 2: SCHIȚĂ SALĂ */
     .map-card {
       flex: 1 1 50%;
       height: 50%;
@@ -318,7 +315,7 @@
       z-index: 2;
     }
 
-    /* BUTOANE ADMIN */
+    /* BARĂ ADMIN JOS */
     .admin-bar {
       position: fixed;
       bottom: 6px;
@@ -386,7 +383,7 @@
 <body>
 
   <div id="kioskApp">
-    <!-- Header Statistici -->
+    <!-- Header -->
     <header>
       <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
       <div class="stats-panel">
@@ -402,7 +399,7 @@
         <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." autocomplete="off">
 
         <div class="result-qr-row">
-          <!-- Card Rezultat Invitat -->
+          <!-- Card Rezultat -->
           <div class="result-card">
             <div class="res-name" id="resName">Tastați numele dvs. pe tastatură</div>
             <div class="res-table" id="resTable">MASA: ---</div>
@@ -410,7 +407,7 @@
             <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
           </div>
 
-          <!-- Cod QR Stânga -->
+          <!-- QR Code -->
           <div class="qr-card-left">
             <div id="qrcode"></div>
             <div class="qr-mini-label">SCAN PE MOBIL</div>
@@ -421,41 +418,44 @@
           <div class="matches-list" id="matchesList"></div>
         </div>
 
-        <!-- Tastatură tactilă -->
+        <!-- TASTATURĂ FĂRĂ DIACRITICE -->
         <div class="keyboard">
+          <!-- Rândul 1 (A - I) -->
           <div class="kb-row">
             <button class="key-btn" onclick="pressKey('A')">A</button>
-            <button class="key-btn" onclick="pressKey('Ă')">Ă</button>
-            <button class="key-btn" onclick="pressKey('Â')">Â</button>
             <button class="key-btn" onclick="pressKey('B')">B</button>
             <button class="key-btn" onclick="pressKey('C')">C</button>
             <button class="key-btn" onclick="pressKey('D')">D</button>
             <button class="key-btn" onclick="pressKey('E')">E</button>
             <button class="key-btn" onclick="pressKey('F')">F</button>
             <button class="key-btn" onclick="pressKey('G')">G</button>
-          </div>
-          <div class="kb-row">
             <button class="key-btn" onclick="pressKey('H')">H</button>
             <button class="key-btn" onclick="pressKey('I')">I</button>
-            <button class="key-btn" onclick="pressKey('Î')">Î</button>
+          </div>
+          <!-- Rândul 2 (J - R) -->
+          <div class="kb-row">
             <button class="key-btn" onclick="pressKey('J')">J</button>
             <button class="key-btn" onclick="pressKey('K')">K</button>
             <button class="key-btn" onclick="pressKey('L')">L</button>
             <button class="key-btn" onclick="pressKey('M')">M</button>
             <button class="key-btn" onclick="pressKey('N')">N</button>
             <button class="key-btn" onclick="pressKey('O')">O</button>
-          </div>
-          <div class="kb-row">
             <button class="key-btn" onclick="pressKey('P')">P</button>
+            <button class="key-btn" onclick="pressKey('Q')">Q</button>
             <button class="key-btn" onclick="pressKey('R')">R</button>
+          </div>
+          <!-- Rândul 3 (S - Z) -->
+          <div class="kb-row">
             <button class="key-btn" onclick="pressKey('S')">S</button>
-            <button class="key-btn" onclick="pressKey('Ș')">Ș</button>
             <button class="key-btn" onclick="pressKey('T')">T</button>
-            <button class="key-btn" onclick="pressKey('Ț')">Ț</button>
             <button class="key-btn" onclick="pressKey('U')">U</button>
             <button class="key-btn" onclick="pressKey('V')">V</button>
+            <button class="key-btn" onclick="pressKey('W')">W</button>
+            <button class="key-btn" onclick="pressKey('X')">X</button>
+            <button class="key-btn" onclick="pressKey('Y')">Y</button>
             <button class="key-btn" onclick="pressKey('Z')">Z</button>
           </div>
+          <!-- Rândul 4 (Comenzi) -->
           <div class="kb-row">
             <button class="key-btn wide" onclick="pressKey(' ')">SPAȚIU</button>
             <button class="key-btn back" onclick="backspaceKey()">⌫ ȘTERGE</button>
@@ -466,7 +466,6 @@
 
       <!-- PARTEA DREAPTĂ (Cadre Fixe) -->
       <div class="right-section">
-        <!-- 1. Player Video / Poză -->
         <div class="video-card">
           <div class="video-header-bar">
             <div class="video-title-tag">MOMENTE SPECIALE</div>
@@ -478,7 +477,6 @@
           </div>
         </div>
 
-        <!-- 2. Schiță Sală -->
         <div class="map-card">
           <div class="map-badge-tag">🗺 SCHIȚĂ SALĂ</div>
           <img id="salaImg" src="" alt="Schiță Restaurant">
@@ -491,7 +489,7 @@
     </div>
   </div>
 
-  <!-- Butoane Bară Admin Jos -->
+  <!-- Butoane Admin -->
   <div class="admin-bar">
     <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
     <button class="btn-admin" onclick="toggleFullScreen()">⛶ Ecran Complet</button>
@@ -520,13 +518,13 @@
         <label>🗺 Poză Schiță Sală (Alege din dispozitiv):</label>
         <div class="upload-box">
           <input type="file" id="fileSalaInput" accept="image/*" onchange="handleSalaUpload(event)">
-          <div style="font-size:0.75rem; color:#aaa; margin-top:4px;">Sau URL extern / nume fișier:</div>
-          <input type="text" id="cfgSalaImg" placeholder="ex: schita.jpg" style="margin-top:4px;">
+          <div style="font-size:0.75rem; color:#aaa; margin-top:4px;">Sau fișier local / URL:</div>
+          <input type="text" id="cfgSalaImg" placeholder="schita.jpg" style="margin-top:4px;">
         </div>
       </div>
 
       <div class="form-group">
-        <label>🔗 Link Cod QR (Cloud poze invitați):</label>
+        <label>🔗 Link Cod QR (Cloud / Drive):</label>
         <input type="text" id="cfgCloudLink" value="https://drive.google.com">
       </div>
 
@@ -554,14 +552,19 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     let tempPlayerBlob = "";
     let tempSalaBlob = "";
 
-    // Eliminare diacritice pentru o căutare facilă
-    function normalizeStr(str) {
+    // Eliminare completă a diacriticelor pentru căutare flexibilă
+    function cleanText(str) {
       if (!str) return "";
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+      return str.normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/ș|ş/gi, "s")
+                .replace(/ț|ţ/gi, "t")
+                .toUpperCase()
+                .trim();
     }
 
     window.onload = function() {
-      // Ascultare tastatură fizică/laptop
+      // Ascultă direct tastarea fizică de la laptop/tabletă
       document.getElementById('searchInput').addEventListener('input', function(e) {
         searchGuest(e.target.value);
         triggerAutoReset();
@@ -570,8 +573,8 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     };
 
     function loadSavedConfig() {
-      const savedCfg = localStorage.getItem('kiosk_config_v3');
-      const savedStatus = localStorage.getItem('kiosk_status_v3');
+      const savedCfg = localStorage.getItem('kiosk_config_v4');
+      const savedStatus = localStorage.getItem('kiosk_status_v4');
       let statusMap = {};
       if (savedStatus) {
         try { statusMap = JSON.parse(savedStatus); } catch(e) {}
@@ -599,7 +602,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       updateStats();
     }
 
-    // Gestiune Fișiere Media
     function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -673,7 +675,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       };
 
       try {
-        localStorage.setItem('kiosk_config_v3', JSON.stringify(cfg));
+        localStorage.setItem('kiosk_config_v4', JSON.stringify(cfg));
       } catch(e) {}
 
       loadSavedConfig();
@@ -683,15 +685,22 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
 
     function parseGuests(rawText, statusMap) {
       guests = [];
-      const lines = rawText.split('\n');
+      if (!rawText) return;
+      
+      const lines = rawText.split(/\r?\n/);
       lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+        
         const parts = line.split('|').map(p => p.trim());
-        if (parts.length >= 2 && parts[0] !== '') {
+        if (parts.length >= 1 && parts[0] !== '') {
           const name = parts[0];
+          const table = parts[1] || 'Fără masă';
+          const zone = parts[2] || 'Sală Principală';
           guests.push({
             name: name,
-            table: parts[1],
-            zone: parts[2] || 'Sală Principală',
+            table: table,
+            zone: zone,
             arrived: statusMap[name] === true
           });
         }
@@ -702,7 +711,7 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
     function saveStatus() {
       const statusMap = {};
       guests.forEach(g => { statusMap[g.name] = g.arrived; });
-      localStorage.setItem('kiosk_status_v3', JSON.stringify(statusMap));
+      localStorage.setItem('kiosk_status_v4', JSON.stringify(statusMap));
     }
 
     function renderQRCode(url) {
@@ -720,7 +729,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       }
     }
 
-    // Funcții tastatură
     function pressKey(char) {
       const input = document.getElementById('searchInput');
       input.value += char;
@@ -747,9 +755,8 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       listEl.innerHTML = '';
     }
 
-    // Algoritm de căutare
     function searchGuest(query) {
-      const cleanQ = normalizeStr(query.trim());
+      const cleanQ = cleanText(query);
       const listEl = document.getElementById('matchesList');
       listEl.innerHTML = '';
       listEl.style.display = 'none';
@@ -759,9 +766,10 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         return;
       }
 
+      // Căutare independentă de diacritice
       const matches = guests
         .map((g, idx) => ({ ...g, idx }))
-        .filter(g => normalizeStr(g.name).includes(cleanQ));
+        .filter(g => cleanText(g.name).includes(cleanQ));
 
       if (matches.length === 0) {
         document.getElementById('resName').innerText = 'Numele nu a fost găsit...';
