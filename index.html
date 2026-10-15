@@ -29,7 +29,6 @@
       overflow: hidden; 
       position: relative; 
     }
-
     #kioskApp {
       width: 100%;
       height: 100%;
@@ -38,7 +37,6 @@
       padding: 10px 16px 12px 16px;
       gap: 10px;
     }
-
     /* HEADER */
     header {
       flex: 0 0 auto;
@@ -58,36 +56,13 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 45%;
+      max-width: 50%;
     }
-    .stats-panel { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 700; }
-    
-    /* BUTONUL FULLSCREEN DIN HEADER (INAINTE DE SOSITI) */
-    .btn-fs-top {
-      background: rgba(255, 215, 0, 0.15);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 5px 13px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
-    }
-    .btn-fs-top:active {
-      background: var(--primary);
-      color: #000;
-      transform: scale(0.97);
-    }
-
+    .stats-panel { display: flex; gap: 8px; font-size: 0.95rem; font-weight: 700; }
     .badge { padding: 4px 12px; border-radius: 20px; }
     .badge-arrived { background: rgba(46, 204, 113, 0.18); color: var(--green); border: 1px solid var(--green); }
     .badge-pending { background: rgba(230, 57, 70, 0.18); color: var(--red); border: 1px solid var(--red); }
     .badge-total { background: rgba(255, 255, 255, 0.1); color: #ddd; }
-
     /* CORP PRINCIPAL: DIMENSIUNI STRICT BLOCATE */
     .kiosk-body {
       flex: 1 1 0;
@@ -96,8 +71,7 @@
       grid-template-columns: 1.25fr 1fr;
       gap: 14px;
     }
-
-    /* STÂNGA: CĂUTARE + REZULTATE SUB TEXT + QR + TASTATURĂ */
+    /* STÂNGA: CĂUTARE + REZULTAT + TASTATURĂ */
     .search-section {
       display: flex;
       flex-direction: column;
@@ -105,7 +79,6 @@
       min-height: 0;
       gap: 8px;
     }
-
     .search-input {
       flex: 0 0 auto;
       width: 100%;
@@ -119,41 +92,6 @@
       outline: none;
       box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
     }
-
-    /* LISTA CU REZULTATE CHIAR SUB BARA DE CĂUTARE */
-    .matches-container {
-      position: relative;
-      flex: 0 0 auto;
-    }
-    .matches-list {
-      max-height: 105px;
-      overflow-y: auto;
-      background: #14171f;
-      border-radius: 8px;
-      display: none;
-      border: 1px solid var(--primary);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    .match-item {
-      padding: 8px 12px;
-      border-bottom: 1px solid #232733;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .match-item:hover, .match-item.active-item { 
-      background: rgba(255,215,0,0.22); 
-      color: #fff; 
-    }
-    .match-item .status { 
-      font-size: 0.8rem; 
-      opacity: 0.85; 
-      font-weight: 700;
-    }
-
     .result-qr-row {
       flex: 0 0 135px;
       height: 135px;
@@ -161,7 +99,6 @@
       gap: 10px;
       align-items: stretch;
     }
-
     .result-card {
       flex: 1;
       background: var(--card-bg);
@@ -196,7 +133,6 @@
       text-transform: uppercase;
     }
     .btn-checkin:disabled { background: #444 !important; color: #aaa; cursor: default; }
-
     .qr-card-left {
       flex: 0 0 120px;
       width: 120px;
@@ -218,7 +154,27 @@
       justify-content: center; 
     }
     .qr-mini-label { font-size: 0.68rem; color: var(--primary); font-weight: 800; margin-top: 4px; }
-
+    /* LISTA REZULTATE CU SCROLL */
+    .matches-container {
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .matches-list {
+      max-height: 90px;
+      overflow-y: auto;
+      background: #14171f;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid #383e4d;
+    }
+    .match-item {
+      padding: 7px 12px;
+      border-bottom: 1px solid #232733;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .match-item:hover, .match-item.active-item { background: rgba(255,215,0,0.22); color: #fff; }
+    .match-item .status { float: right; font-size: 0.8rem; opacity: 0.85; }
     /* TASTATURĂ FĂRĂ DIACRITICE */
     .keyboard {
       flex: 1 1 auto;
@@ -247,7 +203,6 @@
     .key-btn:active { background: var(--primary); color: #000; transform: translateY(1px); }
     .key-btn.wide { flex: 2; background: #343a48; font-size: 0.9rem; }
     .key-btn.back { background: #b71c1c; flex: 1.6; font-size: 0.95rem; }
-
     /* DREAPTA: SUS VIDEO / JOS SCHIȚĂ (50% / 50% FIXE ȘI INDEPENDENTE) */
     .right-section {
       display: flex;
@@ -256,7 +211,6 @@
       height: 100%;
       min-height: 0;
     }
-
     .video-card {
       flex: 1 1 50%;
       height: 50%;
@@ -292,7 +246,6 @@
       cursor: pointer;
     }
     .vol-btn.active-sound { background: var(--green); color: #000; border-color: var(--green); }
-
     .player-media-wrap {
       width: 100%;
       height: 100%;
@@ -315,7 +268,6 @@
       object-fit: contain;
       display: none;
     }
-
     .map-card {
       flex: 1 1 50%;
       height: 50%;
@@ -354,7 +306,6 @@
       font-weight: 800;
       z-index: 2;
     }
-
     /* ADMIN BAR & MODAL */
     .admin-bar {
       position: fixed;
@@ -377,7 +328,23 @@
       cursor: pointer;
       font-weight: 700;
     }
-
+    /* Buton mic Fullscreen mereu vizibil (nu afectează layout) */
+    .fs-btn {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      z-index: 20;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .fs-btn:hover { opacity: 1; }
     #adminModal {
       display: none;
       position: fixed;
@@ -420,30 +387,20 @@
   </style>
 </head>
 <body>
-
   <div id="kioskApp">
     <!-- Header -->
     <header>
       <div class="event-title" id="dispEventTitle">ALINA & RADU - NUNTĂ</div>
       <div class="stats-panel">
-        <!-- BUTON FULLSCREEN PLASAT ÎNAINTE DE SOSIȚI -->
-        <button class="btn-fs-top" onclick="toggleFullScreen()" title="Ecran Complet">⛶ FULLSCREEN</button>
         <div class="badge badge-arrived" id="statArrived">SOSIȚI: 0</div>
         <div class="badge badge-pending" id="statRemaining">RĂMAȘI: 0</div>
         <div class="badge badge-total" id="statTotal">TOTAL: 0</div>
       </div>
     </header>
-
     <div class="kiosk-body">
       <!-- PARTEA STÂNGĂ -->
       <div class="search-section">
         <input type="text" id="searchInput" class="search-input" placeholder="Atingeți literele pentru nume..." autocomplete="off">
-
-        <!-- LISTA CU TOATE NUMELE GĂSITE, CHIAR SUB BARA DE TEXT -->
-        <div class="matches-container">
-          <div class="matches-list" id="matchesList"></div>
-        </div>
-
         <div class="result-qr-row">
           <div class="result-card">
             <div class="res-name" id="resName">Tastați numele dvs. pe tastatură</div>
@@ -451,13 +408,14 @@
             <div class="res-zone" id="resZone">Zona: ---</div>
             <button class="btn-checkin" id="btnCheckIn" onclick="confirmCheckIn()">✔ CONFIRMĂ PREZENȚA (AM SOSIT)</button>
           </div>
-
           <div class="qr-card-left">
             <div id="qrcode"></div>
             <div class="qr-mini-label">SCAN PE MOBIL</div>
           </div>
         </div>
-
+        <div class="matches-container">
+          <div class="matches-list" id="matchesList"></div>
+        </div>
         <!-- TASTATURĂ FĂRĂ DIACRITICE -->
         <div class="keyboard">
           <div class="kb-row">
@@ -499,7 +457,6 @@
           </div>
         </div>
       </div>
-
       <!-- PARTEA DREAPTĂ (Cadre Fixe 50% - 50%) -->
       <div class="right-section">
         <!-- SUS: VIDEO LOOP -->
@@ -513,7 +470,6 @@
             <img id="dedicatedImage" alt="Media">
           </div>
         </div>
-
         <!-- JOS: SCHIȚĂ SALĂ -->
         <div class="map-card">
           <div class="map-badge-tag">🗺 SCHIȚĂ SALĂ</div>
@@ -526,23 +482,22 @@
       </div>
     </div>
   </div>
-
-  <!-- Butoane Bară Admin Jos -->
+  <!-- Buton mic Fullscreen mereu vizibil -->
+  <button class="fs-btn" onclick="toggleFullScreen()">⛶</button>
+  <!-- Butoane Bară Admin -->
   <div class="admin-bar">
     <button class="btn-admin" onclick="openAdminModal()">⚙ Panou Control & Fișiere</button>
-    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+    <button class="btn-admin" onclick="toggleFullScreen()">⛶ Ecran Complet</button>
   </div>
-
   <!-- Modal Admin -->
   <div id="adminModal">
     <div class="admin-content">
       <h2 style="color:var(--primary); margin-bottom: 12px; font-size:1.25rem;">⚙ Panou Control Eveniment</h2>
-
       <div class="form-group">
         <label>Titlu Eveniment:</label>
         <input type="text" id="cfgTitle" value="ALINA & RADU - NUNTĂ">
       </div>
-
+      <!-- Video / Poza de sus -->
       <div class="form-group">
         <label>🎬 Video sau Poză Header (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -551,7 +506,7 @@
           <input type="text" id="cfgPlayerMedia" value="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4" style="margin-top:4px;">
         </div>
       </div>
-
+      <!-- Schița de jos -->
       <div class="form-group">
         <label>🗺 Poză Schiță Sală (Alege din tabletă/laptop):</label>
         <div class="upload-box">
@@ -560,12 +515,10 @@
           <input type="text" id="cfgSalaImg" placeholder="schita.jpg" style="margin-top:4px;">
         </div>
       </div>
-
       <div class="form-group">
         <label>🔗 Link Cod QR (Cloud / Drive):</label>
         <input type="text" id="cfgCloudLink" value="https://drive.google.com">
       </div>
-
       <div class="form-group">
         <label>📋 Listă Invitați (Format: <b>Nume | Masa | Zona</b>):</label>
         <textarea id="cfgGuestList" rows="6">Popescu Ion | Masa 1 | Lângă ring, stânga
@@ -575,22 +528,19 @@ Radu Maria | Masa 2 | În fața scenei
 Stan George | Masa 4 | Lângă geamuri
 Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       </div>
-
       <div style="display:flex; justify-content:space-between; margin-top: 14px;">
         <button class="btn-admin" style="background:var(--green); color:#000; font-size:0.95rem; padding:8px 18px;" onclick="saveConfig()">✔ Salvează Setările</button>
         <button class="btn-admin" style="background:#555; font-size:0.95rem; padding:8px 18px;" onclick="closeAdminModal()">Închide</button>
       </div>
     </div>
   </div>
-
   <script>
     let guests = [];
     let currentSelectedIndex = -1;
     let autoResetTimer = null;
-
+    // Stocare separată pentru sursele media curente
     let activePlayerMedia = "";
     let activeSalaImage = "";
-
     function cleanText(str) {
       if (!str) return "";
       return str.normalize("NFD")
@@ -600,7 +550,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
                 .toUpperCase()
                 .trim();
     }
-
     window.onload = function() {
       document.getElementById('searchInput').addEventListener('input', function(e) {
         searchGuest(e.target.value);
@@ -608,7 +557,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       });
       loadSavedConfig();
     };
-
     function loadSavedConfig() {
       const savedCfg = localStorage.getItem('kiosk_config_v5');
       const savedStatus = localStorage.getItem('kiosk_status_v5');
@@ -616,7 +564,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       if (savedStatus) {
         try { statusMap = JSON.parse(savedStatus); } catch(e) {}
       }
-
       if (savedCfg) {
         const cfg = JSON.parse(savedCfg);
         document.getElementById('dispEventTitle').innerText = cfg.title;
@@ -626,10 +573,8 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         
         activePlayerMedia = cfg.playerMedia || "https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4";
         activeSalaImage = cfg.salaImg || "";
-
         document.getElementById('cfgPlayerMedia').value = activePlayerMedia.startsWith('data:') ? '[Fișier încărcat]' : activePlayerMedia;
         document.getElementById('cfgSalaImg').value = activeSalaImage.startsWith('data:') ? '[Fișier încărcat]' : activeSalaImage;
-
         applyPlayerMedia(activePlayerMedia);
         applySalaImage(activeSalaImage);
         parseGuests(cfg.guestRaw, statusMap);
@@ -644,12 +589,12 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       }
       updateStats();
     }
-
+    // ÎNCĂRCARE VIDEO / IMAGINE SUS
     function handlePlayerUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const isVideo = file.type.startsWith('video');
+      // Dacă este video se folosește un ObjectURL rapid; pentru imagini se salvează în memorie
       if (isVideo) {
         activePlayerMedia = URL.createObjectURL(file);
         applyPlayerMedia(activePlayerMedia);
@@ -662,12 +607,10 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         reader.readAsDataURL(file);
       }
     }
-
     function applyPlayerMedia(src) {
       const video = document.getElementById('dedicatedVideo');
       const img = document.getElementById('dedicatedImage');
       if (!src) return;
-
       const isImg = src.startsWith('data:image') || /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(src);
       if (isImg) {
         video.style.display = 'none';
@@ -681,7 +624,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         video.play().catch(()=>{});
       }
     }
-
     function toggleVideoAudio() {
       const video = document.getElementById('dedicatedVideo');
       const btn = document.getElementById('btnToggleAudio');
@@ -695,11 +637,10 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         btn.classList.remove("active-sound");
       }
     }
-
+    // ÎNCĂRCARE SCHIȚĂ JOS (Conversie directă Base64 ca să nu dispară niciodată)
     function handleSalaUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         activeSalaImage = e.target.result;
@@ -707,7 +648,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       };
       reader.readAsDataURL(file);
     }
-
     function applySalaImage(src) {
       const img = document.getElementById('salaImg');
       const noMapMsg = document.getElementById('noMapMsg');
@@ -720,18 +660,16 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         noMapMsg.style.display = 'block';
       }
     }
-
     function saveConfig() {
+      // Păstrează sursele existente dacă utilizatorul nu a scris alt URL manual
       const manualPlayer = document.getElementById('cfgPlayerMedia').value.trim();
       const manualSala = document.getElementById('cfgSalaImg').value.trim();
-
       if (manualPlayer !== '' && manualPlayer !== '[Fișier încărcat]') {
         activePlayerMedia = manualPlayer;
       }
       if (manualSala !== '' && manualSala !== '[Fișier încărcat]') {
         activeSalaImage = manualSala;
       }
-
       const cfg = {
         title: document.getElementById('cfgTitle').value,
         playerMedia: activePlayerMedia,
@@ -739,13 +677,11 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         cloudLink: document.getElementById('cfgCloudLink').value,
         guestRaw: document.getElementById('cfgGuestList').value
       };
-
       try {
         localStorage.setItem('kiosk_config_v5', JSON.stringify(cfg));
       } catch(e) {
-        console.warn("Storage plin:", e);
+        console.warn("Storage plin, salvare fără fișiere mari în localStorage:", e);
       }
-
       applyPlayerMedia(activePlayerMedia);
       applySalaImage(activeSalaImage);
       parseGuests(cfg.guestRaw, {});
@@ -753,7 +689,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       closeAdminModal();
       clearSearch();
     }
-
     function parseGuests(rawText, statusMap) {
       guests = [];
       if (!rawText) return;
@@ -778,7 +713,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       });
       updateStats();
     }
-
     function saveStatus() {
       const statusMap = {};
       guests.forEach(g => { statusMap[g.name] = g.arrived; });
@@ -786,7 +720,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         localStorage.setItem('kiosk_status_v5', JSON.stringify(statusMap));
       } catch(e) {}
     }
-
     function renderQRCode(url) {
       const qrContainer = document.getElementById('qrcode');
       qrContainer.innerHTML = '';
@@ -801,21 +734,18 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         });
       }
     }
-
     function pressKey(char) {
       const input = document.getElementById('searchInput');
       input.value += char;
       searchGuest(input.value);
       triggerAutoReset();
     }
-
     function backspaceKey() {
       const input = document.getElementById('searchInput');
       input.value = input.value.slice(0, -1);
       searchGuest(input.value);
       triggerAutoReset();
     }
-
     function clearSearch() {
       document.getElementById('searchInput').value = '';
       currentSelectedIndex = -1;
@@ -827,57 +757,45 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       listEl.style.display = 'none';
       listEl.innerHTML = '';
     }
-
-    // Afișează toate numele găsite chiar sub input
     function searchGuest(query) {
       const cleanQ = cleanText(query);
       const listEl = document.getElementById('matchesList');
       listEl.innerHTML = '';
-
+      listEl.style.display = 'none';
       if (!cleanQ) {
         clearSearch();
         return;
       }
-
       const matches = guests
         .map((g, idx) => ({ ...g, idx }))
         .filter(g => cleanText(g.name).includes(cleanQ));
-
       if (matches.length === 0) {
-        listEl.style.display = 'none';
         document.getElementById('resName').innerText = 'Numele nu a fost găsit...';
         document.getElementById('resTable').innerText = 'MASA: ---';
         document.getElementById('resZone').innerText = 'Verificați literele introduse';
         document.getElementById('btnCheckIn').style.display = 'none';
         return;
       }
-
-      // Afișează lista cu toate numele găsite sub input
-      listEl.style.display = 'block';
-      matches.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'match-item' + (m.idx === currentSelectedIndex ? ' active-item' : '');
-        div.innerHTML = `<span>👤 ${m.name} (${m.table})</span><span class="status">${m.arrived ? '✓ Sosit' : '— În așteptare'}</span>`;
-        div.onclick = () => {
-          selectGuest(m.idx);
-          // Actualizează inputul cu numele selectat și restrânge lista
-          document.getElementById('searchInput').value = m.name;
-          listEl.style.display = 'none';
-        };
-        listEl.appendChild(div);
-      });
-
-      // Selectează automat primul invitat găsit
-      selectGuest(matches[0].idx);
+      if (matches.length === 1) {
+        selectGuest(matches[0].idx);
+      } else {
+        listEl.style.display = 'block';
+        matches.forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'match-item' + (m.idx === currentSelectedIndex ? ' active-item' : '');
+          div.innerHTML = `${m.name} <span class="status">${m.arrived ? '✓ Sosit' : '— În așteptare'}</span>`;
+          div.onclick = () => selectGuest(m.idx);
+          listEl.appendChild(div);
+        });
+        selectGuest(matches[0].idx);
+      }
     }
-
     function selectGuest(idx) {
       currentSelectedIndex = idx;
       const g = guests[idx];
       document.getElementById('resName').innerText = g.name;
       document.getElementById('resTable').innerText = g.table;
       document.getElementById('resZone').innerText = 'Zona: ' + g.zone;
-
       const btn = document.getElementById('btnCheckIn');
       btn.style.display = 'block';
       if (g.arrived) {
@@ -888,7 +806,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         btn.disabled = false;
       }
     }
-
     function confirmCheckIn() {
       if (currentSelectedIndex !== -1) {
         guests[currentSelectedIndex].arrived = true;
@@ -900,7 +817,6 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
         setTimeout(clearSearch, 3000);
       }
     }
-
     function updateStats() {
       const arrived = guests.filter(g => g.arrived).length;
       const total = guests.length;
@@ -909,15 +825,12 @@ Vasilescu Dan | Masa 2 | În fața scenei</textarea>
       document.getElementById('statRemaining').innerText = `RĂMAȘI: ${remaining}`;
       document.getElementById('statTotal').innerText = `TOTAL: ${total}`;
     }
-
     function triggerAutoReset() {
       if (autoResetTimer) clearTimeout(autoResetTimer);
       autoResetTimer = setTimeout(clearSearch, 15000);
     }
-
     function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
     function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
-    
     function toggleFullScreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
