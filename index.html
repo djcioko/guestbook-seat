@@ -132,10 +132,9 @@ header{display:flex;justify-content:space-between;align-items:center;background:
       <input id="cfgM" placeholder="sau URL schiță">
     </div>
     <div class="fg"><label>Link QR (opțional – dacă lași gol, folosește linkul de invitat)</label><input id="cfgQ" placeholder="https://..."></div>
-    <div class="fg"><label>Listă invitați (Nume | Masa | Zona) — unul pe linie</label><textarea id="cfgL" rows="6">Marioara Marian | Masa 3 | Lângă scenă
-Galatanu Marinela | Masa 1 | Intrare
-Botorogeanu Marian | Masa 2 | Geam
-Marioara Florina | Masa 3 | Lângă scenă</textarea></div>
+    <div class="fg"><label>Listă invitați (Nume | Masa | Zona | Familie) — unul pe linie</label><textarea id="cfgL" rows="6">Marioara Marian | Masa 3 | Lângă scenă | Marian
+Ion Marian | Masa 3 | Lângă scenă | Marian
+Ana Popescu | Masa 5 | Geam | Popescu</textarea></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
       <button class="abtn" style="background:var(--green);color:#000;" onclick="save()">✔ Salvează</button>
       <button class="abtn" style="background:#c0392b;" onclick="resetEv()">🔄 Reset Eveniment</button>
@@ -143,7 +142,21 @@ Marioara Florina | Masa 3 | Lângă scenă</textarea></div>
     </div>
   </div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDZEEPkP_r0bOLQ8_A3nv5G-3qIVDZVhlo",
+  authDomain: "eventkiosk-98d9d.firebaseapp.com",
+  projectId: "eventkiosk-98d9d",
+  storageBucket: "eventkiosk-98d9d.firebasestorage.app",
+  messagingSenderId: "502704432025",
+  appId: "1:502704432025:web:1ca8358fad1678419c2908",
+  measurementId: "G-QNM0F9YBW7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 let G=[], cur=-1, timer=null, media="", mapu="";
 const isGuest = new URLSearchParams(location.search).get("view") === "guest";
 if(isGuest) document.body.classList.add("guest-mode");
@@ -222,7 +235,7 @@ function resetEv(){
   alert("Resetat. Toți invitații sunt din nou în așteptare.");
 }
 function parse(t,st){
-  G=[]; (t||"").split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return; const p=l.split("|").map(x=>x.trim()); if(p[0])G.push({n:p[0],m:p[1]||"—",z:p[2]||"",a:st[p[0]]===true});});
+  G=[]; (t||"").split(/\r?\n/).forEach(l=>{l=l.trim();if(!l)return; const p=l.split("|").map(x=>x.trim()); if(p[0])G.push({n:p[0],m:p[1]||"—",z:p[2]||"",f:p[3]||"",a:st[p[0]]===true});});
   stats();
 }
 function stats(){
@@ -257,7 +270,7 @@ function sel(i){
   cur=i; const g=G[i];
   document.getElementById("rn").textContent=g.n;
   document.getElementById("rt").textContent=g.m;
-  document.getElementById("rz").textContent=g.z?"✓ "+g.z:"";
+  document.getElementById("rz").textContent=(g.z?"✓ "+g.z:"") + (g.f?"  |  Familia: "+g.f:"");
   const b=document.getElementById("chk"); b.style.display="block";
   if(g.a){b.textContent="✓ Deja sosit";b.disabled=true;b.style.background="#555";}
   else{b.textContent="Sosir ✓";b.disabled=false;b.style.background="var(--green)";}
@@ -265,6 +278,13 @@ function sel(i){
 function check(){
   if(cur<0)return; G[cur].a=true;
   const m={}; G.forEach(g=>m[g.n]=g.a); localStorage.setItem("k7s",JSON.stringify(m));
+  const g = G[cur];
+  db.ref("lastArrival").set({
+    name: g.n,
+    family: g.f || "",
+    table: g.m,
+    time: Date.now()
+  });
   stats(); const b=document.getElementById("chk"); b.textContent="✓ Bine ați venit!"; b.disabled=true;
   setTimeout(clearQ,2500);
 }
