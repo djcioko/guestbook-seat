@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ Monitor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+body{background:#0a0e14;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#121820;border:1px solid #ffd700;border-radius:16px;padding:28px;width:100%;max-width:560px;text-align:center;}
+h1{color:#ffd700;font-size:1.6rem;margin-bottom:6px;}
+.sub{color:#aaa;font-size:.9rem;margin-bottom:14px;}
+.family{background:#0d1117;border:2px solid #00ffcc;border-radius:12px;padding:18px;margin-bottom:16px;min-height:100px;display:flex;flex-direction:column;justify-content:center;}
+.family-label{font-size:.75rem;color:#aaa;letter-spacing:1px;}
+.family-name{font-size:2.4rem;font-weight:900;color:#ffd700;margin-top:4px;word-break:break-word;}
+.guest-name{font-size:1rem;color:#00ffcc;margin-top:6px;}
+.drop{border:2px dashed #ffd700;border-radius:12px;padding:30px 20px;background:#0d1117;cursor:pointer;transition:.2s;}
+.drop:hover,.drop.drag{background:#1a2230;border-color:#00ffcc;}
+.drop p{font-size:1.05rem;margin-bottom:4px;}
+.drop small{color:#888;}
+input[type=file]{display:none;}
+.controls{display:flex;gap:10px;justify-content:center;margin:16px 0;}
+button{padding:12px 24px;font-size:1.05rem;font-weight:800;border:none;border-radius:10px;cursor:pointer;}
+.play{background:#2ecc71;color:#000;}
+.stop{background:#e74c3c;color:#fff;}
+button:disabled{opacity:.4;cursor:not-allowed;}
+.info{margin-top:8px;font-size:.9rem;color:#00ffcc;min-height:22px;}
+.time{font-size:.8rem;color:#aaa;margin-top:4px;}
+.hint{margin-top:14px;font-size:.75rem;color:#666;}
+.auto{margin-top:10px;font-size:.85rem;}
+.auto label{cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>DJ Monitor</h1>
+  <div class="sub">Primește automat de la tabletă</div>
+
+  <div class="family">
+    <div class="family-label">FAMILIA</div>
+    <div class="family-name" id="familyName">—</div>
+    <div class="guest-name" id="guestName"></div>
+  </div>
+
+  <div class="drop" id="drop">
+    <p>Trage MP3 / WAV / FLAC aici</p>
+    <small>sau click pentru a alege</small>
+    <input type="file" id="file" accept="audio/*">
+  </div>
+
+  <div class="controls">
+    <button class="play" id="btnPlay" disabled>▶ Play</button>
+    <button class="stop" id="btnStop" disabled>■ Stop</button>
+  </div>
+
+  <div class="auto">
+    <label><input type="checkbox" id="autoPlay"> Pornește melodia automat la sosire</label>
+  </div>
+
+  <div class="info" id="info">Nicio melodie încărcată</div>
+  <div class="time" id="time"></div>
+  <div class="hint">Space = Stop &nbsp;|&nbsp; Max 60 sec</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDZEEPkP_r0bOLQ8_A3nv5G-3qIVDZVhlo",
+  authDomain: "eventkiosk-98d9d.firebaseapp.com",
+  projectId: "eventkiosk-98d9d",
+  storageBucket: "eventkiosk-98d9d.firebasestorage.app",
+  messagingSenderId: "502704432025",
+  appId: "1:502704432025:web:1ca8358fad1678419c2908",
+  measurementId: "G-QNM0F9YBW7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const btnPlay = document.getElementById('btnPlay');
+const btnStop = document.getElementById('btnStop');
+const info = document.getElementById('info');
+const timeEl = document.getElementById('time');
+const familyName = document.getElementById('familyName');
+const guestName = document.getElementById('guestName');
+const autoPlay = document.getElementById('autoPlay');
+
+let audio = null;
+let timer = null;
+const MAX_SEC = 60;
+
+drop.onclick = () => fileInput.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
+drop.ondragleave = () => drop.classList.remove('drag');
+drop.ondrop = e => {
+  e.preventDefault(); drop.classList.remove('drag');
+  if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+};
+fileInput.onchange = () => { if (fileInput.files.length) loadFile(fileInput.files[0]); };
+
+function loadFile(file) {
+  if (audio) { audio.pause(); audio = null; }
+  clearTimeout(timer);
+  const url = URL.createObjectURL(file);
+  audio = new Audio(url);
+  audio.onended = stop;
+  info.textContent = 'Încărcat: ' + file.name;
+  btnPlay.disabled = false;
+  btnStop.disabled = true;
+  timeEl.textContent = '';
+}
+
+function play() {
+  if (!audio) return;
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+  btnPlay.disabled = true;
+  btnStop.disabled = false;
+  clearTimeout(timer);
+  timer = setTimeout(stop, MAX_SEC * 1000);
+  updateTime();
+}
+
+function stop() {
+  if (audio) audio.pause();
+  clearTimeout(timer);
+  btnPlay.disabled = false;
+  btnStop.disabled = true;
+  timeEl.textContent = '';
+}
+
+function updateTime() {
+  if (!audio || audio.paused) return;
+  const left = Math.max(0, MAX_SEC - Math.floor(audio.currentTime));
+  timeEl.textContent = 'Rămân ' + left + ' sec';
+  if (!audio.paused) requestAnimationFrame(updateTime);
+}
+
+btnPlay.onclick = play;
+btnStop.onclick = stop;
+document.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); stop(); } });
+
+// Primește de la tabletă
+db.ref("lastArrival").on("value", snap => {
+  const d = snap.val();
+  if (!d) return;
+  familyName.textContent = d.family ? d.family.toUpperCase() : "—";
+  guestName.textContent = d.name || "";
+  if (autoPlay.checked && audio) play();
+});
+</script>
+</body>
+</html>
