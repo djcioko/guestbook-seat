@@ -3,136 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DJ Monitor v4</title>
+<title>DJ Monitor v5</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
-body{background:#0a0e14;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
-.top-section{background:#121820;border-bottom:2px solid #00ffcc;padding:8px 12px;}
-.arrival-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
-.family-box{flex:1;background:#0d1117;border:1px solid #00ffcc;border-radius:8px;padding:6px 10px;}
-.family-label{font-size:.6rem;color:#aaa;}
-.family-name{font-size:1.5rem;font-weight:900;color:#ffd700;}
-.guest-info{font-size:.95rem;font-weight:700;}
-.mars-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.mars-controls button{padding:5px 10px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
-.mars-info{font-size:.8rem;color:#fff;font-weight:700;background:#1a2230;padding:4px 8px;border-radius:4px;min-width:140px;}
-.seek-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
-.seek-row input[type=range]{flex:1;accent-color:#00ffcc;}
-.time-info{font-size:.7rem;color:#aaa;white-space:nowrap;}
-.dj-name-row{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#0d1117;border-bottom:1px solid #333;}
-.dj-name-row input{padding:4px 8px;background:#161a22;border:1px solid #333;color:#fff;border-radius:4px;font-size:.8rem;width:140px;}
-.main{flex:1;display:flex;min-height:0;}
-.left{width:180px;background:#121820;border-right:1px solid #333;display:flex;flex-direction:column;}
-.left h3{padding:6px 8px;font-size:.8rem;color:#ffd700;border-bottom:1px solid #333;}
-.playlists{flex:1;overflow-y:auto;padding:4px;}
-.pl-item{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:.75rem;margin-bottom:2px;display:flex;justify-content:space-between;}
-.pl-item:hover,.pl-item.active{background:#1a2230;}
-.pl-item .del{color:#e74c3c;cursor:pointer;}
-.center{flex:1;display:flex;flex-direction:column;min-width:0;}
-.tracks{flex:1;overflow-y:auto;background:#0d1117;}
-.track{display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid #1a1f28;font-size:.75rem;cursor:grab;}
-.track:hover{background:#161c26;}
-.track.playing{background:#1a2a1a;color:#2ecc71;}
-.track .dur{margin-left:auto;color:#888;font-size:.7rem;}
-.track .bpm{width:40px;text-align:right;color:#f39c12;font-size:.7rem;}
-.bottom{height:110px;background:#121820;border-top:1px solid #333;display:flex;flex-direction:column;}
-.wave-wrap{flex:1;}
-canvas{width:100%;height:100%;display:block;}
-.vol-row{display:flex;align-items:center;gap:8px;padding:4px 10px;background:#0d1117;font-size:.7rem;}
-button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;}
+body{background:#0a0e14;color:#fff;height:100vh;display:flex;flex-direction:column;}
+.top{background:#121820;border-bottom:2px solid #00ffcc;padding:8px;}
+.row{display:flex;align-items:center;gap:10px;}
+.box{background:#0d1117;border:1px solid #00ffcc;border-radius:8px;padding:6px 10px;flex:1;}
+.fname{font-size:1.4rem;font-weight:900;color:#ffd700;}
+.gname{font-size:.9rem;}
+button{padding:6px 10px;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;font-weight:700;}
 .play{background:#2ecc71;color:#000;}
 .stop{background:#e74c3c;}
-.pause{background:#f39c12;color:#000;}
-.next{background:#3498db;}
-.hint{font-size:.65rem;color:#666;padding:2px 8px;}
+.main{flex:1;display:flex;min-height:0;}
+.left{width:160px;background:#121820;border-right:1px solid #333;overflow-y:auto;}
+.center{flex:1;display:flex;flex-direction:column;}
+.tracks{flex:1;overflow-y:auto;background:#0d1117;}
+.track{padding:5px 8px;border-bottom:1px solid #222;cursor:pointer;display:flex;font-size:.8rem;}
+.track:hover{background:#1a2230;}
+.track.on{background:#1a3a1a;color:#2ecc71;}
+.bot{background:#121820;padding:6px;border-top:1px solid #333;}
+input[type=range]{accent-color:#ffd700;}
+#status{font-size:.75rem;color:#aaa;}
 </style>
 </head>
 <body>
-<div class="top-section">
-  <div style="font-size:.6rem;color:#666;margin-bottom:4px;">DJ Monitor v4</div>
-  <div class="arrival-row">
-    <div class="family-box">
-      <div style="display:flex;justify-content:space-between;">
-        <div>
-          <div class="family-label">ULTIMUL SOSIT</div>
-          <div class="family-name" id="familyName">—</div>
-          <div class="guest-info" id="guestName"></div>
-        </div>
-        <div style="text-align:right;font-size:.7rem;">
-          <div id="statArrived" style="color:#2ecc71;font-weight:700;">SOSIȚI: 0</div>
-          <div id="statRemaining" style="color:#e74c3c;">RĂMAȘI: 0</div>
-          <div id="statTotal" style="color:#aaa;">TOTAL: 0</div>
-        </div>
-      </div>
+<div class="top">
+  <div style="font-size:.6rem;color:#666;">DJ Monitor v5</div>
+  <div class="row">
+    <div class="box">
+      <div style="font-size:.6rem;color:#aaa;">ULTIMUL SOSIT</div>
+      <div class="fname" id="family">—</div>
+      <div class="gname" id="guest"></div>
     </div>
-    <div class="mars-controls">
-      <button id="btnMarsFile" onclick="document.getElementById('marsIn').click()">+ Marș</button>
-      <span class="mars-info" id="marsInfo">Fără marș</span>
-      <button class="play" id="btnPlayMars">▶ Play</button>
-      <button class="stop" id="btnStopMars">■ Stop</button>
-      <label style="font-size:.7rem;"><input type="checkbox" id="autoMars" checked> Auto</label>
-      <label style="font-size:.7rem;"><input type="checkbox" id="skipRepeat" checked> Nu repeta</label>
+    <div style="text-align:right;font-size:.75rem;">
+      <div id="sA" style="color:#2ecc71;">SOSIȚI: 0</div>
+      <div id="sR" style="color:#e74c3c;">RĂMAȘI: 0</div>
+      <div id="sT" style="color:#aaa;">TOTAL: 0</div>
+    </div>
+    <div>
+      <button onclick="document.getElementById('marsIn').click()">+ Marș</button>
+      <span id="marsName" style="font-size:.75rem;margin:0 6px;">—</span>
+      <button class="play" onclick="playMars(true)">▶</button>
+      <button class="stop" onclick="stopMars()">■</button>
+      <label style="font-size:.7rem;"><input type="checkbox" id="auto" checked> Auto</label>
+      <label style="font-size:.7rem;"><input type="checkbox" id="norep" checked> Nu repeta</label>
     </div>
   </div>
-  <div class="seek-row" style="margin-top:2px;">
-    <span class="time-info" id="plCur">0:00</span>
-    <input type="range" id="plSeek" min="0" max="100" value="0">
-    <span class="time-info" id="plTot">0:00</span>
-    <span class="time-info" id="plLeft">-0:00</span>
+  <div style="margin-top:4px;display:flex;align-items:center;gap:6px;font-size:.7rem;">
+    <span id="mCur">0:00</span>
+    <input type="range" id="mSeek" style="flex:1;" min="0" max="100" value="0">
+    <span id="mTot">0:00</span>
   </div>
 </div>
 
-<div class="dj-name-row">
-  <span style="font-size:.75rem;color:#aaa;">DJ:</span>
-  <input id="djName" placeholder="Nume DJ" onchange="localStorage.setItem('djName',this.value)">
-  <button onclick="savePlaylist()">Salvează</button>
-  <button id="btnNewPl">+ Playlist</button>
-  <button id="btnSettings">⚙</button>
-  <span style="margin-left:auto;font-size:.7rem;color:#aaa;" id="status">Gata</span>
+<div style="padding:4px 8px;background:#0d1117;display:flex;gap:6px;align-items:center;">
+  <input id="djName" placeholder="DJ" style="padding:4px;background:#161a22;border:1px solid #333;color:#fff;width:100px;" onchange="localStorage.setItem('djName',this.value)">
+  <button onclick="document.getElementById('fileIn').click()">+ File</button>
+  <button onclick="document.getElementById('folderIn').click()">+ Folder</button>
+  <button onclick="savePL()">Salvează</button>
+  <span id="status" style="margin-left:auto;">Gata</span>
 </div>
 
 <div class="main">
-  <div class="left">
-    <h3>Playlists</h3>
-    <div class="playlists" id="playlists"></div>
-  </div>
+  <div class="left" id="pls"></div>
   <div class="center">
-    <div style="display:flex;gap:6px;padding:6px;background:#121820;">
-      <button class="play" id="btnPlay">▶</button>
-      <button class="pause" id="btnPause">⏸</button>
-      <button class="stop" id="btnStop">■</button>
-      <button class="next" id="btnNext">⏭</button>
-      <button id="btnAddFile" onclick="document.getElementById('fileIn').click()">+ File</button>
-      <button id="btnAddFolder" onclick="document.getElementById('folderIn').click()">+ Folder</button>
+    <div style="padding:4px;background:#121820;display:flex;gap:4px;">
+      <button class="play" onclick="toggle()">▶</button>
+      <button class="stop" onclick="stopPL()">■</button>
+      <button onclick="next()">⏭</button>
     </div>
     <div class="tracks" id="tracks"></div>
-    <div class="hint">Double-click = play | Drag = reordonare | ✕ = șterge</div>
   </div>
 </div>
 
-<div class="bottom">
-  <div class="wave-wrap"><canvas id="wave"></canvas></div>
-  <div class="vol-row">
-    <label>Vol Playlist</label>
-    <input type="range" id="vol" min="0" max="100" value="80" style="width:90px;">
-    <span id="volVal">80</span>
-    <label>Vol Marș</label>
-    <input type="range" id="marsVolSlider" min="0" max="100" value="90" style="width:90px;">
-    <span id="marsVolVal">90</span>
+<div class="bot">
+  <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;">
+    <span id="pCur">0:00</span>
+    <input type="range" id="pSeek" style="flex:1;" min="0" max="100" value="0">
+    <span id="pTot">0:00</span>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:4px;font-size:.7rem;">
+    <label>Vol PL <input type="range" id="vPL" min="0" max="100" value="80" style="width:80px;"></label>
+    <label>Vol Marș <input type="range" id="vM" min="0" max="100" value="90" style="width:80px;"></label>
   </div>
 </div>
 
-<div class="settings" id="settings" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;">
-  <div style="background:#161a22;border:1px solid #ffd700;border-radius:10px;padding:16px;width:90%;max-width:380px;">
-    <h3 style="color:#ffd700;margin-bottom:10px;">Setări</h3>
-    <div style="margin-bottom:8px;"><label style="font-size:.7rem;color:#aaa;">Tastă Play/Pause</label><input id="keyPlay" value="Space" style="width:100%;padding:4px;background:#0c0e12;border:1px solid #333;color:#fff;"></div>
-    <div style="margin-bottom:8px;"><label style="font-size:.7rem;color:#aaa;">Tastă Stop Marș</label><input id="keyStopMars" value="KeyM" style="width:100%;padding:4px;background:#0c0e12;border:1px solid #333;color:#fff;"></div>
-    <div style="display:flex;gap:6px;margin-top:10px;">
-      <button onclick="localStorage.setItem('djKeys',JSON.stringify({play:document.getElementById('keyPlay').value,stopMars:document.getElementById('keyStopMars').value}));document.getElementById('settings').style.display='none';" style="background:#2ecc71;color:#000;">Salvează</button>
-      <button onclick="document.getElementById('settings').style.display='none'">Închide</button>
-    </div>
-  </div>
-</div>
 <input type="file" id="marsIn" accept="audio/*" style="display:none">
 <input type="file" id="fileIn" multiple accept="audio/*" style="display:none">
 <input type="file" id="folderIn" webkitdirectory multiple style="display:none">
@@ -140,260 +96,120 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDZEEPkP_r0bOLQ8_A3nv5G-3qIVDZVhlo",
-  authDomain: "eventkiosk-98d9d.firebaseapp.com",
-  projectId: "eventkiosk-98d9d",
-  storageBucket: "eventkiosk-98d9d.firebasestorage.app",
-  messagingSenderId: "502704432025",
-  appId: "1:502704432025:web:1ca8358fad1678419c2908",
-  measurementId: "G-QNM0F9YBW7"
-};
+const firebaseConfig={apiKey:"AIzaSyDZEEPkP_r0bOLQ8_A3nv5G-3qIVDZVhlo",authDomain:"eventkiosk-98d9d.firebaseapp.com",projectId:"eventkiosk-98d9d",storageBucket:"eventkiosk-98d9d.firebasestorage.app",messagingSenderId:"502704432025",appId:"1:502704432025:web:1ca8358fad1678419c2908"};
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const db=firebase.database();
 
-let playlists = JSON.parse(localStorage.getItem("djPlaylists")||'[{"id":1,"name":"Main","tracks":[]}]');
-let currentPl = 0, currentTrack = -1, audio = null, marsAudio = null;
-let isPlaying = false, wasPlayingBeforeMars = false, savedVolume = 80, marsUrl = null, lastFamily = "";
-let audioCtx, analyser, sourceNode;
-const canvas = document.getElementById("wave");
-const ctx = canvas.getContext("2d");
-const tracksEl = document.getElementById("tracks");
-const playlistsEl = document.getElementById("playlists");
-const volSlider = document.getElementById("vol");
-const volVal = document.getElementById("volVal");
-const familyName = document.getElementById("familyName");
-const guestName = document.getElementById("guestName");
-const statusEl = document.getElementById("status");
-const marsSeek = document.getElementById("marsSeek");
+let PLS=JSON.parse(localStorage.getItem("djPL")||'[{"n":"Main","t":[]}]');
+let curPL=0, curT=-1, audio=null, marsA=null, playing=false, wasPlaying=false, lastFam="", marsUrl=null;
+const status=document.getElementById("status");
 
-function init(){
-  document.getElementById("djName").value = localStorage.getItem("djName")||"";
-  renderPlaylists();
-  renderTracks();
-  setupAudio();
-  listenFirebase();
-  loadMars();
-  requestAnimationFrame(drawWave);
-  const plSeek = document.getElementById("plSeek");
-function updatePlTime(){
-  if(!audio || audio.paused) return;
-  const c=audio.currentTime, d=audio.duration||0;
-  document.getElementById("plCur").textContent = formatTime(c);
-  document.getElementById("plTot").textContent = formatTime(d);
-  document.getElementById("plLeft").textContent = "-"+formatTime(Math.max(0,d-c));
-  if(d) plSeek.value = (c/d)*100;
-}
-plSeek.oninput = ()=>{ if(audio && audio.duration) audio.currentTime = (plSeek.value/100)*audio.duration; };
-setInterval(updatePlTime, 200);
-}
-function openDB(){
-  return new Promise((res,rej)=>{
-    const r = indexedDB.open("djMonitor",1);
-    r.onupgradeneeded = e => { if(!e.target.result.objectStoreNames.contains("files")) e.target.result.createObjectStore("files"); };
-    r.onsuccess = e => res(e.target.result);
-    r.onerror = () => rej();
+function savePL(){ localStorage.setItem("djPL",JSON.stringify(PLS)); status.textContent="Salvat"; }
+function renderPL(){
+  const el=document.getElementById("pls"); el.innerHTML="";
+  PLS.forEach((p,i)=>{
+    const d=document.createElement("div");
+    d.style.cssText="padding:6px;cursor:pointer;"+(i===curPL?"background:#1a2230;":"");
+    d.textContent=p.n;
+    d.onclick=()=>{curPL=i;renderPL();renderT();};
+    el.appendChild(d);
   });
 }
-async function saveMars(blob, name){
-  try{
-    const dbx = await openDB();
-    dbx.transaction("files","readwrite").objectStore("files").put({blob, name}, "mars");
-  }catch(e){}
-  if(marsUrl) URL.revokeObjectURL(marsUrl);
-  marsUrl = URL.createObjectURL(blob);
-  document.getElementById("marsInfo").textContent = name;
-  const a = new Audio(marsUrl);
-  a.onloadedmetadata = () => document.getElementById("marsTot").textContent = formatTime(a.duration);
-}
-async function loadMars(){
-  try{
-    const dbx = await openDB();
-    const req = dbx.transaction("files","readonly").objectStore("files").get("mars");
-    req.onsuccess = () => {
-      if(req.result){
-        marsUrl = URL.createObjectURL(req.result.blob);
-        document.getElementById("marsInfo").textContent = req.result.name;
-      }
-    };
-  }catch(e){}
-}
-function setupAudio(){
-  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-}
-function savePlaylist(){ localStorage.setItem("djPlaylists", JSON.stringify(playlists)); statusEl.textContent="Salvat"; }
-function renderPlaylists(){
-  playlistsEl.innerHTML = "";
-  playlists.forEach((p,i)=>{
-    const d = document.createElement("div");
-    d.className = "pl-item"+(i===currentPl?" active":"");
-    d.innerHTML = `<span>${p.name}</span><span class="del" onclick="event.stopPropagation();if(playlists.length>1&&confirm('Ștergi?')){playlists.splice(${i},1);if(currentPl>=playlists.length)currentPl=0;renderPlaylists();renderTracks();savePlaylist();}">✕</span>`;
-    d.onclick = ()=>{ currentPl=i; renderPlaylists(); renderTracks(); };
-    playlistsEl.appendChild(d);
+function renderT(){
+  const el=document.getElementById("tracks"); el.innerHTML="";
+  (PLS[curPL].t||[]).forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="track"+(i===curT?" on":"");
+    d.innerHTML=`<span style="flex:1">${t.n}</span><span style="color:#888">${t.d||""}</span>`;
+    d.ondblclick=()=>playT(i);
+    el.appendChild(d);
   });
 }
-function renderTracks(){
-  tracksEl.innerHTML = "";
-  playlists[currentPl].tracks.forEach((t,i)=>{
-    const d = document.createElement("div");
-    d.className = "track"+(i===currentTrack?" playing":"");
-    d.draggable = true;
-    d.innerHTML = `<span style="flex:1">${t.name}</span><span class="bpm">${t.bpm||"--"}</span><span class="dur">${t.dur||"--:--"}</span><span style="color:#e74c3c;cursor:pointer;width:24px;text-align:center;" onclick="event.stopPropagation();playlists[currentPl].tracks.splice(${i},1);renderTracks();savePlaylist();">✕</span>`;
-    d.onclick = ()=> { currentTrack=i; renderTracks(); };
-    d.ondblclick = ()=> playTrack(i);
-    d.ondragstart = e => { e.dataTransfer.setData("text/plain", i); d.style.opacity="0.5"; };
-    d.ondragend = () => d.style.opacity="1";
-    d.ondragover = e => e.preventDefault();
-    d.ondrop = e => {
-      e.preventDefault();
-      const from = parseInt(e.dataTransfer.getData("text/plain"));
-      if(from === i || isNaN(from)) return;
-      const arr = playlists[currentPl].tracks;
-      const [moved] = arr.splice(from, 1);
-      arr.splice(i, 0, moved);
-      renderTracks();
-      savePlaylist();
-    };
-    tracksEl.appendChild(d);
-  });
-}
-function addTrack(file){
-  if(!file) return;
-  const url = URL.createObjectURL(file);
-  const a = new Audio(url);
-  a.onloadedmetadata = ()=>{
-    if(!playlists[currentPl]) return;
-    playlists[currentPl].tracks.push({name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""});
-    renderTracks();
-    savePlaylist();
-    statusEl.textContent = "Adăugat: " + file.name;
+function addT(f){
+  if(!f) return;
+  const url=URL.createObjectURL(f);
+  const a=new Audio(url);
+  a.onloadedmetadata=()=>{
+    if(!PLS[curPL].t) PLS[curPL].t=[];
+    PLS[curPL].t.push({n:f.name,u:url,d:fmt(a.duration)});
+    renderT(); savePL();
+    status.textContent="OK "+f.name;
   };
-  a.onerror = ()=>{ statusEl.textContent = "Eroare: " + file.name; };
 }
-function playTrack(i){
-  currentTrack = i;
-  const t = playlists[currentPl].tracks[i];
-  if(!t) return;
-  if(marsAudio){ marsAudio.pause(); marsAudio=null; }
+function playT(i){
+  curT=i; const t=PLS[curPL].t[i]; if(!t) return;
+  if(marsA){marsA.pause();marsA=null;}
   if(audio) audio.pause();
-  audio = new Audio(t.url);
-  audio.volume = volSlider.value/100;
-  audio.onended = ()=>{ if(currentTrack < playlists[currentPl].tracks.length-1) playTrack(currentTrack+1); };
+  audio=new Audio(t.u);
+  audio.volume=document.getElementById("vPL").value/100;
+  audio.onended=()=>{ if(curT<PLS[curPL].t.length-1) playT(curT+1); };
   audio.play().catch(()=>{});
-  isPlaying = true;
-  statusEl.textContent = "Redă: "+t.name;
-  renderTracks();
-  try{
-    if(sourceNode) sourceNode.disconnect();
-    sourceNode = audioCtx.createMediaElementSource(audio);
-    sourceNode.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }catch(e){}
+  playing=true; status.textContent="▶ "+t.n; renderT();
 }
-function togglePlay(){
-  if(!audio){ if(playlists[currentPl].tracks.length) playTrack(0); return; }
-  if(isPlaying){ audio.pause(); isPlaying=false; statusEl.textContent="Pauză"; }
-  else{ audio.play(); isPlaying=true; }
-}
-function stopAll(){ if(audio){ audio.pause(); audio.currentTime=0; } isPlaying=false; statusEl.textContent="Stop"; }
-function formatTime(s){ if(!s||!isFinite(s)) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
-function drawWave(){
-  requestAnimationFrame(drawWave);
-  if(!analyser) return;
-  const w = canvas.width = canvas.offsetWidth, h = canvas.height = canvas.offsetHeight;
-  const data = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(data);
-  ctx.clearRect(0,0,w,h);
-  const barW = w / data.length * 2.5;
-  let x=0;
-  for(let i=0;i<data.length;i++){
-    const barH = (data[i]/255)*h;
-    ctx.fillStyle = `hsl(${(i/data.length)*360},80%,55%)`;
-    ctx.fillRect(x, h-barH, barW-1, barH);
-    x += barW;
-  }
-}
-function listenFirebase(){
-  db.ref("lastArrival").on("value", snap=>{
-    const d = snap.val();
-    if(!d) return;
-    familyName.textContent = d.family ? d.family.toUpperCase() : "—";
-    guestName.innerHTML = `<span style="color:#ffd700">${d.name||""}</span> <span style="color:#e74c3c">${d.table||""}</span>`;
-    playMars(false);
-  });
-  db.ref("stats").on("value", snap=>{
-    const s = snap.val()||{};
-    document.getElementById("statArrived").textContent = "SOSIȚI: "+(s.arrived||0);
-    document.getElementById("statRemaining").textContent = "RĂMAȘI: "+(s.remaining||0);
-    document.getElementById("statTotal").textContent = "TOTAL: "+(s.total||0);
-  });
+function toggle(){ if(!audio){ if(PLS[curPL].t.length) playT(0); return; } if(playing){audio.pause();playing=false;}else{audio.play();playing=true;} }
+function stopPL(){ if(audio){audio.pause();audio.currentTime=0;} playing=false; status.textContent="Stop"; }
+function next(){ if(curT<PLS[curPL].t.length-1) playT(curT+1); }
+function fmt(s){ if(!s) return "0:00"; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
+
+function saveMars(f){
+  marsUrl=URL.createObjectURL(f);
+  document.getElementById("marsName").textContent=f.name;
+  status.textContent="Marș OK";
 }
 function playMars(manual){
-  if(!manual && !document.getElementById("autoMars").checked) return;
-  const fam = familyName.textContent.trim();
-  if(!manual && document.getElementById("skipRepeat").checked && fam && fam === lastFamily && fam !== "—"){
-    statusEl.textContent = "Familie repetată";
-    return;
-  }
-  if(fam && fam !== "—") lastFamily = fam;
-  wasPlayingBeforeMars = isPlaying;
-  savedVolume = volSlider.value;
-  if(audio && isPlaying){ audio.pause(); isPlaying=false; }
-  if(!marsUrl){ statusEl.textContent="Fără marș"; return; }
-  if(marsAudio) marsAudio.pause();
-  marsAudio = new Audio(marsUrl);
-  marsAudio.volume = document.getElementById("marsVolSlider").value/100;
-  marsAudio.onended = ()=>{ marsAudio=null; resumePlaylist(); };
-  marsAudio.play().catch(()=>{});
-  statusEl.textContent = "Marș...";
+  if(!manual && !document.getElementById("auto").checked) return;
+  const fam=document.getElementById("family").textContent;
+  if(!manual && document.getElementById("norep").checked && fam===lastFam && fam!=="—"){ status.textContent="Repetat"; return; }
+  if(fam!=="—") lastFam=fam;
+  wasPlaying=playing;
+  if(audio && playing){ audio.pause(); playing=false; }
+  if(!marsUrl){ status.textContent="Fără marș"; return; }
+  if(marsA) marsA.pause();
+  marsA=new Audio(marsUrl);
+  marsA.volume=document.getElementById("vM").value/100;
+  marsA.onended=()=>{ marsA=null; if(wasPlaying && audio){ audio.play(); playing=true; } };
+  marsA.play().catch(()=>{});
+  status.textContent="Marș...";
 }
-function stopMarsManual(){
-  if(marsAudio){ marsAudio.pause(); marsAudio=null; }
-  resumePlaylist();
-}
-function resumePlaylist(){
-  if(wasPlayingBeforeMars && audio){
-    audio.volume = 0;
-    audio.play().catch(()=>{});
-    isPlaying = true;
-    let v=0; const target=savedVolume/100; const step=target/20;
-    const iv=setInterval(()=>{ v+=step; if(v>=target){v=target;clearInterval(iv);} if(audio) audio.volume=v; volSlider.value=Math.round(v*100); volVal.textContent=volSlider.value; },50);
-    statusEl.textContent = "Reia";
-  }
-}
-function updateMarsTime(){
-  if(!marsAudio || marsAudio.paused) return;
-  const c=marsAudio.currentTime, d=marsAudio.duration||0;
-  document.getElementById("marsCur").textContent = formatTime(c);
-  document.getElementById("marsTot").textContent = formatTime(d);
-  document.getElementById("marsLeft").textContent = "-"+formatTime(Math.max(0,d-c));
-  if(d) marsSeek.value = (c/d)*100;
-}
-marsSeek.oninput = ()=>{ if(marsAudio && marsAudio.duration) marsAudio.currentTime = (marsSeek.value/100)*marsAudio.duration; };
-volSlider.oninput = ()=>{ volVal.textContent=volSlider.value; if(audio && !marsAudio) audio.volume=volSlider.value/100; };
-document.getElementById("marsVolSlider").oninput = e=>{ document.getElementById("marsVolVal").textContent=e.target.value; if(marsAudio) marsAudio.volume=e.target.value/100; };
+function stopMars(){ if(marsA){marsA.pause();marsA=null;} if(wasPlaying && audio){audio.play();playing=true;} status.textContent="Marș stop"; }
 
-document.getElementById("btnPlay").onclick = togglePlay;
-document.getElementById("btnPause").onclick = ()=>{ if(audio){audio.pause();isPlaying=false;statusEl.textContent="Pauză";} };
-document.getElementById("btnStop").onclick = stopAll;
-document.getElementById("btnNext").onclick = ()=>{ if(currentTrack < playlists[currentPl].tracks.length-1) playTrack(currentTrack+1); };
-document.getElementById("btnAddFile").onclick = ()=> document.getElementById("fileIn").click();
-document.getElementById("btnAddFolder").onclick = ()=> document.getElementById("folderIn").click();
-document.getElementById("fileIn").onchange = e => { [...e.target.files].forEach(addTrack); e.target.value=""; };
-document.getElementById("folderIn").onchange = e => { [...e.target.files].forEach(addTrack); e.target.value=""; };
-document.getElementById("marsIn").onchange = e => { const f=e.target.files[0]; if(f){ saveMars(f,f.name); statusEl.textContent="Marș: "+f.name; } e.target.value=""; };
-document.getElementById("btnPlayMars").onclick = ()=> playMars(true);
-document.getElementById("btnStopMars").onclick = stopMarsManual;
-document.getElementById("btnNewPl").onclick = ()=>{ const n=prompt("Nume playlist","Nou"); if(n){ playlists.push({id:Date.now(),name:n,tracks:[]}); renderPlaylists(); savePlaylist(); } };
-document.getElementById("btnSettings").onclick = ()=> document.getElementById("settings").style.display="flex";
+document.getElementById("marsIn").onchange=e=>{ const f=e.target.files[0]; if(f) saveMars(f); e.target.value=""; };
+document.getElementById("fileIn").onchange=e=>{ [...e.target.files].forEach(addT); e.target.value=""; };
+document.getElementById("folderIn").onchange=e=>{ [...e.target.files].forEach(addT); e.target.value=""; };
 
-document.addEventListener("keydown", e=>{
-  if(e.code==="Space"){ e.preventDefault(); if(marsAudio && !marsAudio.paused) stopMarsManual(); else togglePlay(); }
+setInterval(()=>{
+  if(marsA && !marsA.paused){
+    document.getElementById("mCur").textContent=fmt(marsA.currentTime);
+    document.getElementById("mTot").textContent=fmt(marsA.duration);
+    if(marsA.duration) document.getElementById("mSeek").value=(marsA.currentTime/marsA.duration)*100;
+  }
+  if(audio && !audio.paused){
+    document.getElementById("pCur").textContent=fmt(audio.currentTime);
+    document.getElementById("pTot").textContent=fmt(audio.duration);
+    if(audio.duration) document.getElementById("pSeek").value=(audio.currentTime/audio.duration)*100;
+  }
+},200);
+document.getElementById("mSeek").oninput=e=>{ if(marsA && marsA.duration) marsA.currentTime=(e.target.value/100)*marsA.duration; };
+document.getElementById("pSeek").oninput=e=>{ if(audio && audio.duration) audio.currentTime=(e.target.value/100)*audio.duration; };
+document.getElementById("vPL").oninput=e=>{ if(audio) audio.volume=e.target.value/100; };
+document.getElementById("vM").oninput=e=>{ if(marsA) marsA.volume=e.target.value/100; };
+
+db.ref("lastArrival").on("value",s=>{
+  const d=s.val(); if(!d) return;
+  document.getElementById("family").textContent=d.family?d.family.toUpperCase():"—";
+  document.getElementById("guest").innerHTML=`<span style="color:#ffd700">${d.name||""}</span> <span style="color:#e74c3c">${d.table||""}</span>`;
+  playMars(false);
+});
+db.ref("stats").on("value",s=>{
+  const x=s.val()||{};
+  document.getElementById("sA").textContent="SOSIȚI: "+(x.arrived||0);
+  document.getElementById("sR").textContent="RĂMAȘI: "+(x.remaining||0);
+  document.getElementById("sT").textContent="TOTAL: "+(x.total||0);
 });
 
-init();
+document.getElementById("djName").value=localStorage.getItem("djName")||"";
+renderPL(); renderT();
+document.addEventListener("keydown",e=>{ if(e.code==="Space"){e.preventDefault(); if(marsA&&!marsA.paused) stopMars(); else toggle();} });
 </script>
 </body>
 </html>
