@@ -66,7 +66,7 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
       </div>
     </div>
     <div class="mars-controls">
-      <button id="btnMarsFile">+ Marș</button>
+      <button id="btnMarsFile" onclick="document.getElementById('marsIn').click()">+ Marș</button>
       <span class="mars-info" id="marsInfo">Fără marș</span>
       <button class="play" id="btnPlayMars">▶ Play</button>
       <button class="stop" id="btnStopMars">■ Stop</button>
@@ -102,8 +102,8 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
       <button class="pause" id="btnPause">⏸</button>
       <button class="stop" id="btnStop">■</button>
       <button class="next" id="btnNext">⏭</button>
-      <button id="btnAddFile">+ File</button>
-      <button id="btnAddFolder">+ Folder</button>
+      <button id="btnAddFile" onclick="document.getElementById('fileIn').click()">+ File</button>
+      <button id="btnAddFolder" onclick="document.getElementById('folderIn').click()">+ Folder</button>
     </div>
     <div class="tracks" id="tracks"></div>
     <div class="hint">Double-click = play | Drag = reordonare | ✕ = șterge</div>
