@@ -262,7 +262,7 @@ function setupDragDrop(){
 function setupKeyboard(){
   document.addEventListener("keydown", e=>{
     const s = getSettings();
-    if(e.code === s.keyPlay){ e.preventDefault(); togglePlay(); }
+    if(e.code === s.keyPlay){ e.preventDefault(); if(marsAudio && !marsAudio.paused) stopMarsManual(); else togglePlay(); }
     if(e.code === s.keyNext){ e.preventDefault(); nextTrack(); }
     if(e.code === s.keyStop){ e.preventDefault(); stopAll(); }
     if(e.code === s.keyStopMars){ e.preventDefault(); stopMarsManual(); }
@@ -488,6 +488,9 @@ function resumePlaylist(){
     audio.play().catch(()=>{});
     isPlaying = true;
     fadeUp();
+    statusEl.textContent = "Reia playlist";
+  } else {
+    statusEl.textContent = "Gata";
   }
 }
 function fadeUp(){
