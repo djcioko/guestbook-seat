@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DJ Monitor</title>
+<title>DJ Monitor v3</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
 body{background:#0a0e14;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
@@ -58,6 +58,7 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
 </head>
 <body>
 <div class="top-section">
+  <div style="font-size:.6rem;color:#666;margin-bottom:4px;">DJ Monitor v3 – Invitați + Playlist</div>
   <div class="arrival-row">
     <div class="family-box">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -219,20 +220,6 @@ function openDB(){
     r.onsuccess = e => res(e.target.result);
     r.onerror = () => rej();
   });
-}
-async function saveMars(blob, name){
-  try{
-    const dbx = await openDB();
-    const tx = dbx.transaction("files","readwrite");
-    tx.objectStore("files").put({blob, name}, "mars");
-  }catch(e){}
-  if(marsUrl) URL.revokeObjectURL(marsUrl);
-  marsUrl = URL.createObjectURL(blob);
-  const a = new Audio(marsUrl);
-  a.onloadedmetadata = () => {
-    document.getElementById("marsInfo").textContent = name;
-    marsTot.textContent = formatTime(a.duration);
-  };
 }
 async function loadMars(){
   try{
