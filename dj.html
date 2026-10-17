@@ -221,9 +221,11 @@ function openDB(){
   });
 }
 async function saveMars(blob, name){
-  const dbx = await openDB();
-  const tx = dbx.transaction("files","readwrite");
-  tx.objectStore("files").put({blob, name}, "mars");
+  try{
+    const dbx = await openDB();
+    const tx = dbx.transaction("files","readwrite");
+    tx.objectStore("files").put({blob, name}, "mars");
+  }catch(e){}
   if(marsUrl) URL.revokeObjectURL(marsUrl);
   marsUrl = URL.createObjectURL(blob);
   const a = new Audio(marsUrl);
@@ -353,19 +355,48 @@ function drawTrackWave(t){
   }
 }
 async function addTrack(file){
-  const dbx = await openDB();
-  const id = "t_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
-  const tx = dbx.transaction("files","readwrite");
-  tx.objectStore("files").put({blob:file, name:file.name}, id);
-  const url = URL.createObjectURL(file);
-  const a = new Audio(url);
-  a.onloadedmetadata = ()=>{
-    playlists[currentPl].tracks.push({
-      id, name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""
-    });
-    renderTracks();
-    savePlaylist();
-  };
+  try{
+    const dbx = await openDB();
+    const id = "t_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+    const tx = dbx.transaction("files","readwrite");
+    tx.objectStore("files").put({blob:file, name:file.name}, id);
+    const url = URL.createObjectURL(file);
+    const a = new Audio(url);
+    a.onloadedmetadata = ()=>{
+      playlists[currentPl].tracks.push({
+        id, name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""
+      });
+      renderTracks();
+      savePlaylist();
+    };
+    a.onerror = ()=>{ statusEl.textContent = "Eroare încărcare piesă"; };
+  }catch(e){
+    statusEl.textContent = "Eroare DB: " + e.message;
+    const url = URL.createObjectURL(file);
+    const a = new Audio(url);
+    a.onloadedmetadata = ()=>{
+      playlists[currentPl].tracks.push({name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""});
+      renderTracks();
+    };
+  }
+}
+async function saveMars(blob, name){
+  try{
+    const dbx = await openDB();
+    const tx = dbx.transaction("files","readwrite");
+    tx.objectStore("files").put({blob, name}, "mars");
+    if(marsUrl) URL.revokeObjectURL(marsUrl);
+    marsUrl = URL.createObjectURL(blob);
+    const a = new Audio(marsUrl);
+    a.onloadedmetadata = () => {
+      document.getElementById("marsInfo").textContent = name;
+      marsTot.textContent = formatTime(a.duration);
+    };
+  }catch(e){
+    statusEl.textContent = "Eroare marș: " + e.message;
+    marsUrl = URL.createObjectURL(blob);
+    document.getElementById("marsInfo").textContent = name;
+  }
 }
 async function restoreTracks(){
   const dbx = await openDB();
