@@ -79,6 +79,7 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
       <button class="play" id="btnPlayMars">▶ Play Marș</button>
       <button class="stop" id="btnStopMars">■ Stop Marș</button>
       <label style="font-size:.7rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="autoMars" checked> Auto la sosire</label>
+      <label style="font-size:.7rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="skipRepeat" checked> Nu repeta familie</label>
     </div>
   </div>
   <div class="seek-row">
@@ -456,15 +457,22 @@ function listenFirebase(){
     document.getElementById("statTotal").textContent = "TOTAL: " + (s.total||0);
   });
 }
-function playMars(){
-  if(!document.getElementById("autoMars").checked && !arguments[0]) return;
+let lastFamily = "";
+function playMars(manual){
+  if(!manual && !document.getElementById("autoMars").checked) return;
+  const fam = familyName.textContent.trim();
+  if(!manual && document.getElementById("skipRepeat").checked && fam && fam === lastFamily){
+    statusEl.textContent = "Familie repetată – marș oprit";
+    return;
+  }
+  lastFamily = fam;
   wasPlayingBeforeMars = isPlaying;
   savedVolume = volSlider.value;
   if(audio && isPlaying){ audio.pause(); isPlaying=false; }
   if(!marsUrl){ statusEl.textContent="Fără marș"; setTimeout(resumePlaylist,500); return; }
   if(marsAudio) marsAudio.pause();
   marsAudio = new Audio(marsUrl);
-  marsAudio.volume = (getSettings().marsVol||90)/100;
+  marsAudio.volume = document.getElementById("marsVolSlider").value/100;
   marsAudio.onended = ()=>{ marsAudio=null; resumePlaylist(); };
   marsAudio.play().catch(()=>{});
   statusEl.textContent = "Marș...";
@@ -500,6 +508,10 @@ function updateMarsTime(){
 }
 marsSeek.oninput = ()=>{ if(marsAudio && marsAudio.duration) marsAudio.currentTime = (marsSeek.value/100)*marsAudio.duration; };
 volSlider.oninput = ()=>{ volVal.textContent=volSlider.value; if(audio && !marsAudio) audio.volume=volSlider.value/100; };
+document.getElementById("marsVolSlider").oninput = e=>{
+  document.getElementById("marsVolVal").textContent = e.target.value;
+  if(marsAudio) marsAudio.volume = e.target.value/100;
+};
 document.getElementById("xfade").oninput = e=> document.getElementById("xfadeVal").textContent=e.target.value+"s";
 
 document.getElementById("btnPlay").onclick = togglePlay;
