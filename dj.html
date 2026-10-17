@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DJ Monitor v3</title>
+<title>DJ Monitor v4</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
 body{background:#0a0e14;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
@@ -11,63 +11,54 @@ body{background:#0a0e14;color:#fff;height:100vh;overflow:hidden;display:flex;fle
 .arrival-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
 .family-box{flex:1;background:#0d1117;border:1px solid #00ffcc;border-radius:8px;padding:6px 10px;}
 .family-label{font-size:.6rem;color:#aaa;}
-.family-name{font-size:1.6rem;font-weight:900;color:#ffd700;}
-.guest-info{font-size:1rem;color:#3498db;font-weight:700;}
+.family-name{font-size:1.5rem;font-weight:900;color:#ffd700;}
+.guest-info{font-size:.95rem;font-weight:700;}
 .mars-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .mars-controls button{padding:5px 10px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
-.mars-controls .stop{background:#c0392b;}
-.mars-info{font-size:.85rem;color:#fff;font-weight:700;min-width:180px;background:#1a2230;padding:4px 8px;border-radius:4px;}
+.mars-info{font-size:.8rem;color:#fff;font-weight:700;background:#1a2230;padding:4px 8px;border-radius:4px;min-width:140px;}
 .seek-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
 .seek-row input[type=range]{flex:1;accent-color:#00ffcc;}
 .time-info{font-size:.7rem;color:#aaa;white-space:nowrap;}
 .dj-name-row{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#0d1117;border-bottom:1px solid #333;}
-.dj-name-row input{padding:4px 8px;background:#161a22;border:1px solid #333;color:#fff;border-radius:4px;font-size:.8rem;width:160px;}
+.dj-name-row input{padding:4px 8px;background:#161a22;border:1px solid #333;color:#fff;border-radius:4px;font-size:.8rem;width:140px;}
 .main{flex:1;display:flex;min-height:0;}
-.left{width:200px;background:#121820;border-right:1px solid #333;display:flex;flex-direction:column;}
+.left{width:180px;background:#121820;border-right:1px solid #333;display:flex;flex-direction:column;}
 .left h3{padding:6px 8px;font-size:.8rem;color:#ffd700;border-bottom:1px solid #333;}
 .playlists{flex:1;overflow-y:auto;padding:4px;}
-.pl-item{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:.75rem;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;}
+.pl-item{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:.75rem;margin-bottom:2px;display:flex;justify-content:space-between;}
 .pl-item:hover,.pl-item.active{background:#1a2230;}
-.pl-item .del{color:#e74c3c;font-size:.7rem;cursor:pointer;}
+.pl-item .del{color:#e74c3c;cursor:pointer;}
 .center{flex:1;display:flex;flex-direction:column;min-width:0;}
 .tracks{flex:1;overflow-y:auto;background:#0d1117;}
 .track{display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid #1a1f28;font-size:.75rem;cursor:grab;}
-.track .bpm{width:50px;text-align:right;color:#f39c12;font-size:.7rem;margin-left:8px;}
-.track-wave{height:40px;background:#0a0e14;border-top:1px solid #333;}
 .track:hover{background:#161c26;}
 .track.playing{background:#1a2a1a;color:#2ecc71;}
 .track .dur{margin-left:auto;color:#888;font-size:.7rem;}
-.bottom{height:120px;background:#121820;border-top:1px solid #333;display:flex;flex-direction:column;}
+.track .bpm{width:40px;text-align:right;color:#f39c12;font-size:.7rem;}
+.bottom{height:110px;background:#121820;border-top:1px solid #333;display:flex;flex-direction:column;}
 .wave-wrap{flex:1;}
 canvas{width:100%;height:100%;display:block;}
 .vol-row{display:flex;align-items:center;gap:8px;padding:4px 10px;background:#0d1117;font-size:.7rem;}
-.vol-row label{color:#aaa;width:50px;}
-input[type=range]{accent-color:#ffd700;}
 button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
 .play{background:#2ecc71;color:#000;}
 .stop{background:#e74c3c;}
 .pause{background:#f39c12;color:#000;}
 .next{background:#3498db;}
 .hint{font-size:.65rem;color:#666;padding:2px 8px;}
-.settings{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;}
-.settings .box{background:#161a22;border:1px solid #ffd700;border-radius:10px;padding:16px;width:90%;max-width:420px;}
-.fg{margin-bottom:8px;}
-.fg label{display:block;font-size:.7rem;color:#aaa;margin-bottom:2px;}
-.fg input{width:100%;padding:5px;background:#0c0e12;border:1px solid #333;color:#fff;border-radius:4px;}
 </style>
 </head>
 <body>
 <div class="top-section">
-  <div style="font-size:.6rem;color:#666;margin-bottom:4px;">DJ Monitor v3 – Invitați + Playlist</div>
+  <div style="font-size:.6rem;color:#666;margin-bottom:4px;">DJ Monitor v4</div>
   <div class="arrival-row">
     <div class="family-box">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="display:flex;justify-content:space-between;">
         <div>
           <div class="family-label">ULTIMUL SOSIT</div>
           <div class="family-name" id="familyName">—</div>
           <div class="guest-info" id="guestName"></div>
         </div>
-        <div style="text-align:right;font-size:.7rem;line-height:1.3;">
+        <div style="text-align:right;font-size:.7rem;">
           <div id="statArrived" style="color:#2ecc71;font-weight:700;">SOSIȚI: 0</div>
           <div id="statRemaining" style="color:#e74c3c;">RĂMAȘI: 0</div>
           <div id="statTotal" style="color:#aaa;">TOTAL: 0</div>
@@ -77,10 +68,10 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
     <div class="mars-controls">
       <button id="btnMarsFile">+ Marș</button>
       <span class="mars-info" id="marsInfo">Fără marș</span>
-      <button class="play" id="btnPlayMars">▶ Play Marș</button>
-      <button class="stop" id="btnStopMars">■ Stop Marș</button>
-      <label style="font-size:.7rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="autoMars" checked> Auto la sosire</label>
-      <label style="font-size:.7rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="skipRepeat" checked> Nu repeta familie</label>
+      <button class="play" id="btnPlayMars">▶ Play</button>
+      <button class="stop" id="btnStopMars">■ Stop</button>
+      <label style="font-size:.7rem;"><input type="checkbox" id="autoMars" checked> Auto</label>
+      <label style="font-size:.7rem;"><input type="checkbox" id="skipRepeat" checked> Nu repeta</label>
     </div>
   </div>
   <div class="seek-row">
@@ -93,9 +84,9 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
 
 <div class="dj-name-row">
   <span style="font-size:.75rem;color:#aaa;">DJ:</span>
-  <input id="djName" placeholder="Nume DJ" onchange="saveDjName()">
-  <button onclick="savePlaylist()">Salvează Playlist</button>
-  <button onclick="document.getElementById('btnNewPl').click()">+ Playlist</button>
+  <input id="djName" placeholder="Nume DJ" onchange="localStorage.setItem('djName',this.value)">
+  <button onclick="savePlaylist()">Salvează</button>
+  <button id="btnNewPl">+ Playlist</button>
   <button id="btnSettings">⚙</button>
   <span style="margin-left:auto;font-size:.7rem;color:#aaa;" id="status">Gata</span>
 </div>
@@ -115,42 +106,25 @@ button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radiu
       <button id="btnAddFolder">+ Folder</button>
     </div>
     <div class="tracks" id="tracks"></div>
-    <div class="track-wave"><canvas id="trackWave"></canvas></div>
-    <div class="hint">Click = select &nbsp;|&nbsp; Double-click = play &nbsp;|&nbsp; Drag pentru reordonare &nbsp;|&nbsp; BPM click pentru sortare</div>
+    <div class="hint">Double-click = play | Drag = reordonare | ✕ = șterge</div>
   </div>
 </div>
 
 <div class="bottom">
   <div class="wave-wrap"><canvas id="wave"></canvas></div>
   <div class="vol-row">
-    <label>Volum</label>
-    <input type="range" id="vol" min="0" max="100" value="80" style="width:120px;">
+    <label>Vol Playlist</label>
+    <input type="range" id="vol" min="0" max="100" value="80" style="width:90px;">
     <span id="volVal">80</span>
-    <label style="width:70px;">Crossfade</label>
-    <input type="range" id="xfade" min="1" max="10" value="3" style="width:80px;">
-    <span id="xfadeVal">3s</span>
-  </div>
-</div>
-
-<div class="settings" id="settings">
-  <div class="box">
-    <h3 style="color:#ffd700;margin-bottom:10px;">Setări</h3>
-    <div class="fg"><label>Tastă Play/Pause</label><input id="keyPlay" value="Space"></div>
-    <div class="fg"><label>Tastă Next</label><input id="keyNext" value="ArrowRight"></div>
-    <div class="fg"><label>Tastă Stop</label><input id="keyStop" value="Escape"></div>
-    <div class="fg"><label>Tastă Stop Marș</label><input id="keyStopMars" value="KeyM"></div>
-    <div class="fg"><label>Volum marș</label><input type="number" id="marsVol" value="90" min="0" max="100"></div>
-    <div style="display:flex;gap:6px;margin-top:10px;">
-      <button onclick="saveSettings()" style="background:#2ecc71;color:#000;">Salvează</button>
-      <button onclick="document.getElementById('settings').style.display='none'">Închide</button>
-    </div>
+    <label>Vol Marș</label>
+    <input type="range" id="marsVolSlider" min="0" max="100" value="90" style="width:90px;">
+    <span id="marsVolVal">90</span>
   </div>
 </div>
 
 <input type="file" id="marsIn" accept="audio/*" style="display:none">
 <input type="file" id="fileIn" multiple accept="audio/*" style="display:none">
 <input type="file" id="folderIn" webkitdirectory multiple style="display:none">
-<button id="btnNewPl" style="display:none;">+ Playlist</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -168,18 +142,11 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let playlists = JSON.parse(localStorage.getItem("djPlaylists")||'[{"id":1,"name":"Main","tracks":[]}]');
-let currentPl = 0;
-let currentTrack = -1;
-let audio = null;
-let marsAudio = null;
-let isPlaying = false;
-let wasPlayingBeforeMars = false;
-let savedVolume = 80;
-let marsUrl = null;
+let currentPl = 0, currentTrack = -1, audio = null, marsAudio = null;
+let isPlaying = false, wasPlayingBeforeMars = false, savedVolume = 80, marsUrl = null, lastFamily = "";
 let audioCtx, analyser, sourceNode;
 const canvas = document.getElementById("wave");
 const ctx = canvas.getContext("2d");
-
 const tracksEl = document.getElementById("tracks");
 const playlistsEl = document.getElementById("playlists");
 const volSlider = document.getElementById("vol");
@@ -188,52 +155,44 @@ const familyName = document.getElementById("familyName");
 const guestName = document.getElementById("guestName");
 const statusEl = document.getElementById("status");
 const marsSeek = document.getElementById("marsSeek");
-const marsCur = document.getElementById("marsCur");
-const marsTot = document.getElementById("marsTot");
-const marsLeft = document.getElementById("marsLeft");
 
 function init(){
   document.getElementById("djName").value = localStorage.getItem("djName")||"";
   renderPlaylists();
-  restoreTracks().then(()=>renderTracks());
-  loadSettings();
+  renderTracks();
   setupAudio();
-  setupDragDrop();
-  setupKeyboard();
   listenFirebase();
   loadMars();
   requestAnimationFrame(drawWave);
   setInterval(updateMarsTime, 200);
 }
-function saveDjName(){ localStorage.setItem("djName", document.getElementById("djName").value); }
-function savePlaylist(){
-  localStorage.setItem("djPlaylists", JSON.stringify(playlists));
-  statusEl.textContent = "Playlist salvat";
-}
 function openDB(){
   return new Promise((res,rej)=>{
-    const r = indexedDB.open("djMonitor",2);
-    r.onupgradeneeded = e => {
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains("files")) db.createObjectStore("files");
-    };
+    const r = indexedDB.open("djMonitor",1);
+    r.onupgradeneeded = e => { if(!e.target.result.objectStoreNames.contains("files")) e.target.result.createObjectStore("files"); };
     r.onsuccess = e => res(e.target.result);
     r.onerror = () => rej();
   });
 }
+async function saveMars(blob, name){
+  try{
+    const dbx = await openDB();
+    dbx.transaction("files","readwrite").objectStore("files").put({blob, name}, "mars");
+  }catch(e){}
+  if(marsUrl) URL.revokeObjectURL(marsUrl);
+  marsUrl = URL.createObjectURL(blob);
+  document.getElementById("marsInfo").textContent = name;
+  const a = new Audio(marsUrl);
+  a.onloadedmetadata = () => document.getElementById("marsTot").textContent = formatTime(a.duration);
+}
 async function loadMars(){
   try{
     const dbx = await openDB();
-    const tx = dbx.transaction("files","readonly");
-    const req = tx.objectStore("files").get("mars");
+    const req = dbx.transaction("files","readonly").objectStore("files").get("mars");
     req.onsuccess = () => {
       if(req.result){
         marsUrl = URL.createObjectURL(req.result.blob);
-        const a = new Audio(marsUrl);
-        a.onloadedmetadata = () => {
-          document.getElementById("marsInfo").textContent = req.result.name;
-          marsTot.textContent = formatTime(a.duration);
-        };
+        document.getElementById("marsInfo").textContent = req.result.name;
       }
     };
   }catch(e){}
@@ -243,199 +202,50 @@ function setupAudio(){
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 256;
 }
-function setupDragDrop(){
-  const area = document.getElementById("tracks");
-  area.ondragover = e => e.preventDefault();
-  area.ondrop = e => { e.preventDefault(); [...e.dataTransfer.files].forEach(addTrack); };
-}
-function setupKeyboard(){
-  document.addEventListener("keydown", e=>{
-    const s = getSettings();
-    if(e.code === s.keyPlay){ e.preventDefault(); if(marsAudio && !marsAudio.paused) stopMarsManual(); else togglePlay(); }
-    if(e.code === s.keyNext){ e.preventDefault(); nextTrack(); }
-    if(e.code === s.keyStop){ e.preventDefault(); stopAll(); }
-    if(e.code === s.keyStopMars){ e.preventDefault(); stopMarsManual(); }
-  });
-}
-function getSettings(){ return JSON.parse(localStorage.getItem("djSettings")||'{"keyPlay":"Space","keyNext":"ArrowRight","keyStop":"Escape","keyStopMars":"KeyM","marsVol":90}'); }
-function saveSettings(){
-  const s = { keyPlay:document.getElementById("keyPlay").value, keyNext:document.getElementById("keyNext").value, keyStop:document.getElementById("keyStop").value, keyStopMars:document.getElementById("keyStopMars").value, marsVol:parseInt(document.getElementById("marsVol").value)||90 };
-  localStorage.setItem("djSettings", JSON.stringify(s));
-  document.getElementById("settings").style.display="none";
-}
-function loadSettings(){
-  const s = getSettings();
-  document.getElementById("keyPlay").value = s.keyPlay;
-  document.getElementById("keyNext").value = s.keyNext;
-  document.getElementById("keyStop").value = s.keyStop;
-  document.getElementById("keyStopMars").value = s.keyStopMars||"KeyM";
-  document.getElementById("marsVol").value = s.marsVol;
-}
+function savePlaylist(){ localStorage.setItem("djPlaylists", JSON.stringify(playlists)); statusEl.textContent="Salvat"; }
 function renderPlaylists(){
   playlistsEl.innerHTML = "";
   playlists.forEach((p,i)=>{
     const d = document.createElement("div");
     d.className = "pl-item"+(i===currentPl?" active":"");
-    d.innerHTML = `<span>${p.name}</span><span class="del" onclick="event.stopPropagation();deletePl(${i})">✕</span>`;
+    d.innerHTML = `<span>${p.name}</span><span class="del" onclick="event.stopPropagation();if(playlists.length>1&&confirm('Ștergi?')){playlists.splice(${i},1);if(currentPl>=playlists.length)currentPl=0;renderPlaylists();renderTracks();savePlaylist();}">✕</span>`;
     d.onclick = ()=>{ currentPl=i; renderPlaylists(); renderTracks(); };
-    d.ondblclick = ()=>{ const n=prompt("Nume",p.name); if(n){p.name=n; renderPlaylists(); savePlaylist();} };
     playlistsEl.appendChild(d);
   });
 }
-function deletePl(i){
-  if(playlists.length<=1) return alert("Trebuie să rămână cel puțin un playlist");
-  if(confirm("Ștergi playlist-ul?")){ playlists.splice(i,1); if(currentPl>=playlists.length) currentPl=0; renderPlaylists(); renderTracks(); savePlaylist(); }
-}
 function renderTracks(){
   tracksEl.innerHTML = "";
-  const header = document.createElement("div");
-  header.style.cssText = "display:flex;padding:4px 8px;font-size:.7rem;color:#aaa;border-bottom:1px solid #333;background:#161a22;";
-  header.innerHTML = `<span style="flex:1">Piesă</span><span class="bpm" style="cursor:pointer" onclick="sortTracks('bpm')">BPM</span><span class="dur" style="cursor:pointer" onclick="sortTracks('dur')">Timp</span><span style="width:30px"></span>`;
-  tracksEl.appendChild(header);
   playlists[currentPl].tracks.forEach((t,i)=>{
     const d = document.createElement("div");
     d.className = "track"+(i===currentTrack?" playing":"");
-    d.draggable = true;
-    d.innerHTML = `<span style="flex:1">${t.name}</span><span class="bpm">${t.bpm||"--"}</span><span class="dur">${t.dur||"--:--"}</span><span style="color:#e74c3c;cursor:pointer;width:30px;text-align:center;" onclick="event.stopPropagation();deleteTrack(${i})">✕</span>`;
-    d.onclick = ()=> { selectTrack(i); drawTrackWave(t); };
+    d.innerHTML = `<span style="flex:1">${t.name}</span><span class="bpm">${t.bpm||"--"}</span><span class="dur">${t.dur||"--:--"}</span><span style="color:#e74c3c;cursor:pointer;width:24px;text-align:center;" onclick="event.stopPropagation();playlists[currentPl].tracks.splice(${i},1);renderTracks();savePlaylist();">✕</span>`;
+    d.onclick = ()=> { currentTrack=i; renderTracks(); };
     d.ondblclick = ()=> playTrack(i);
-    d.ondragstart = e => e.dataTransfer.setData("text/plain", i);
-    d.ondragover = e => e.preventDefault();
-    d.ondrop = e => {
-      e.preventDefault();
-      const from = parseInt(e.dataTransfer.getData("text/plain"));
-      const to = i;
-      if(from===to) return;
-      const arr = playlists[currentPl].tracks;
-      const [moved] = arr.splice(from,1);
-      arr.splice(to,0,moved);
-      renderTracks();
-      savePlaylist();
-    };
     tracksEl.appendChild(d);
   });
 }
-function deleteTrack(i){
-  if(confirm("Ștergi piesa?")){
-    playlists[currentPl].tracks.splice(i,1);
+function addTrack(file){
+  const url = URL.createObjectURL(file);
+  const a = new Audio(url);
+  a.onloadedmetadata = ()=>{
+    playlists[currentPl].tracks.push({name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""});
     renderTracks();
     savePlaylist();
-  }
+  };
 }
-function sortTracks(by){
-  const arr = playlists[currentPl].tracks;
-  if(by==="bpm") arr.sort((a,b)=>(parseInt(a.bpm)||999)-(parseInt(b.bpm)||999));
-  if(by==="dur") arr.sort((a,b)=>(a.durSec||0)-(b.durSec||0));
-  renderTracks();
-  savePlaylist();
-}
-function drawTrackWave(t){
-  const c = document.getElementById("trackWave");
-  const cx = c.getContext("2d");
-  c.width = c.offsetWidth; c.height = c.offsetHeight;
-  cx.clearRect(0,0,c.width,c.height);
-  // Simple placeholder waveform bars
-  for(let i=0;i<80;i++){
-    const h = Math.random()*c.height*0.8;
-    cx.fillStyle = `hsl(${i*4},70%,50%)`;
-    cx.fillRect(i*(c.width/80), c.height-h, c.width/80-1, h);
-  }
-}
-async function addTrack(file){
-  try{
-    const dbx = await openDB();
-    const id = "t_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
-    const tx = dbx.transaction("files","readwrite");
-    tx.objectStore("files").put({blob:file, name:file.name}, id);
-    const url = URL.createObjectURL(file);
-    const a = new Audio(url);
-    a.onloadedmetadata = ()=>{
-      playlists[currentPl].tracks.push({
-        id, name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""
-      });
-      renderTracks();
-      savePlaylist();
-    };
-    a.onerror = ()=>{ statusEl.textContent = "Eroare încărcare piesă"; };
-  }catch(e){
-    statusEl.textContent = "Eroare DB: " + e.message;
-    const url = URL.createObjectURL(file);
-    const a = new Audio(url);
-    a.onloadedmetadata = ()=>{
-      playlists[currentPl].tracks.push({name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""});
-      renderTracks();
-    };
-  }
-}
-async function saveMars(blob, name){
-  try{
-    const dbx = await openDB();
-    const tx = dbx.transaction("files","readwrite");
-    tx.objectStore("files").put({blob, name}, "mars");
-    if(marsUrl) URL.revokeObjectURL(marsUrl);
-    marsUrl = URL.createObjectURL(blob);
-    const a = new Audio(marsUrl);
-    a.onloadedmetadata = () => {
-      document.getElementById("marsInfo").textContent = name;
-      marsTot.textContent = formatTime(a.duration);
-    };
-  }catch(e){
-    statusEl.textContent = "Eroare marș: " + e.message;
-    marsUrl = URL.createObjectURL(blob);
-    document.getElementById("marsInfo").textContent = name;
-  }
-}
-async function restoreTracks(){
-  const dbx = await openDB();
-  const tx = dbx.transaction("files","readonly");
-  const store = tx.objectStore("files");
-  for(const pl of playlists){
-    for(const t of pl.tracks){
-      if(t.id){
-        const req = store.get(t.id);
-        req.onsuccess = ()=>{
-          if(req.result){
-            t.url = URL.createObjectURL(req.result.blob);
-          }
-        };
-      }
-    }
-  }
-}
-function selectTrack(i){ currentTrack=i; renderTracks(); }
 function playTrack(i){
   currentTrack = i;
   const t = playlists[currentPl].tracks[i];
   if(!t) return;
-  stopMarsManual();
+  if(marsAudio){ marsAudio.pause(); marsAudio=null; }
   if(audio) audio.pause();
   audio = new Audio(t.url);
   audio.volume = volSlider.value/100;
-  audio.onended = nextTrack;
+  audio.onended = ()=>{ if(currentTrack < playlists[currentPl].tracks.length-1) playTrack(currentTrack+1); };
   audio.play().catch(()=>{});
   isPlaying = true;
   statusEl.textContent = "Redă: "+t.name;
   renderTracks();
-  connectWave();
-}
-function togglePlay(){
-  if(!audio){ if(playlists[currentPl].tracks.length) playTrack(0); return; }
-  if(isPlaying){ audio.pause(); isPlaying=false; statusEl.textContent="Pauză"; }
-  else{ audio.play(); isPlaying=true; statusEl.textContent="Redă"; }
-}
-function nextTrack(){
-  const pl = playlists[currentPl];
-  if(currentTrack < pl.tracks.length-1) playTrack(currentTrack+1);
-  else stopAll();
-}
-function stopAll(){
-  if(audio){ audio.pause(); audio.currentTime=0; }
-  isPlaying=false;
-  statusEl.textContent="Stop";
-}
-function formatTime(s){ if(!s||!isFinite(s)) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
-function connectWave(){
-  if(!audioCtx || !audio) return;
   try{
     if(sourceNode) sourceNode.disconnect();
     sourceNode = audioCtx.createMediaElementSource(audio);
@@ -443,11 +253,17 @@ function connectWave(){
     analyser.connect(audioCtx.destination);
   }catch(e){}
 }
+function togglePlay(){
+  if(!audio){ if(playlists[currentPl].tracks.length) playTrack(0); return; }
+  if(isPlaying){ audio.pause(); isPlaying=false; statusEl.textContent="Pauză"; }
+  else{ audio.play(); isPlaying=true; }
+}
+function stopAll(){ if(audio){ audio.pause(); audio.currentTime=0; } isPlaying=false; statusEl.textContent="Stop"; }
+function formatTime(s){ if(!s||!isFinite(s)) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
 function drawWave(){
   requestAnimationFrame(drawWave);
   if(!analyser) return;
-  const w = canvas.width = canvas.offsetWidth;
-  const h = canvas.height = canvas.offsetHeight;
+  const w = canvas.width = canvas.offsetWidth, h = canvas.height = canvas.offsetHeight;
   const data = new Uint8Array(analyser.frequencyBinCount);
   analyser.getByteFrequencyData(data);
   ctx.clearRect(0,0,w,h);
@@ -466,28 +282,27 @@ function listenFirebase(){
     if(!d) return;
     familyName.textContent = d.family ? d.family.toUpperCase() : "—";
     guestName.innerHTML = `<span style="color:#ffd700">${d.name||""}</span> <span style="color:#e74c3c">${d.table||""}</span>`;
-    playMars();
+    playMars(false);
   });
   db.ref("stats").on("value", snap=>{
-    const s = snap.val() || {};
-    document.getElementById("statArrived").textContent = "SOSIȚI: " + (s.arrived||0);
-    document.getElementById("statRemaining").textContent = "RĂMAȘI: " + (s.remaining||0);
-    document.getElementById("statTotal").textContent = "TOTAL: " + (s.total||0);
+    const s = snap.val()||{};
+    document.getElementById("statArrived").textContent = "SOSIȚI: "+(s.arrived||0);
+    document.getElementById("statRemaining").textContent = "RĂMAȘI: "+(s.remaining||0);
+    document.getElementById("statTotal").textContent = "TOTAL: "+(s.total||0);
   });
 }
-let lastFamily = "";
 function playMars(manual){
   if(!manual && !document.getElementById("autoMars").checked) return;
   const fam = familyName.textContent.trim();
-  if(!manual && document.getElementById("skipRepeat").checked && fam && fam === lastFamily){
-    statusEl.textContent = "Familie repetată – marș oprit";
+  if(!manual && document.getElementById("skipRepeat").checked && fam && fam === lastFamily && fam !== "—"){
+    statusEl.textContent = "Familie repetată";
     return;
   }
-  lastFamily = fam;
+  if(fam && fam !== "—") lastFamily = fam;
   wasPlayingBeforeMars = isPlaying;
   savedVolume = volSlider.value;
   if(audio && isPlaying){ audio.pause(); isPlaying=false; }
-  if(!marsUrl){ statusEl.textContent="Fără marș"; setTimeout(resumePlaylist,500); return; }
+  if(!marsUrl){ statusEl.textContent="Fără marș"; return; }
   if(marsAudio) marsAudio.pause();
   marsAudio = new Audio(marsUrl);
   marsAudio.volume = document.getElementById("marsVolSlider").value/100;
@@ -497,7 +312,6 @@ function playMars(manual){
 }
 function stopMarsManual(){
   if(marsAudio){ marsAudio.pause(); marsAudio=null; }
-  statusEl.textContent = "Marș oprit";
   resumePlaylist();
 }
 function resumePlaylist(){
@@ -505,40 +319,27 @@ function resumePlaylist(){
     audio.volume = 0;
     audio.play().catch(()=>{});
     isPlaying = true;
-    fadeUp();
-    statusEl.textContent = "Reia playlist";
-  } else {
-    statusEl.textContent = "Gata";
+    let v=0; const target=savedVolume/100; const step=target/20;
+    const iv=setInterval(()=>{ v+=step; if(v>=target){v=target;clearInterval(iv);} if(audio) audio.volume=v; volSlider.value=Math.round(v*100); volVal.textContent=volSlider.value; },50);
+    statusEl.textContent = "Reia";
   }
-}
-function fadeUp(){
-  let v=0; const target=savedVolume/100; const step=target/25;
-  const iv=setInterval(()=>{
-    v+=step; if(v>=target){v=target; clearInterval(iv);}
-    if(audio) audio.volume=v;
-    volSlider.value=Math.round(v*100); volVal.textContent=volSlider.value;
-  },40);
 }
 function updateMarsTime(){
   if(!marsAudio || marsAudio.paused) return;
   const c=marsAudio.currentTime, d=marsAudio.duration||0;
-  marsCur.textContent = formatTime(c);
-  marsTot.textContent = formatTime(d);
-  marsLeft.textContent = "-"+formatTime(d-c);
+  document.getElementById("marsCur").textContent = formatTime(c);
+  document.getElementById("marsTot").textContent = formatTime(d);
+  document.getElementById("marsLeft").textContent = "-"+formatTime(Math.max(0,d-c));
   if(d) marsSeek.value = (c/d)*100;
 }
 marsSeek.oninput = ()=>{ if(marsAudio && marsAudio.duration) marsAudio.currentTime = (marsSeek.value/100)*marsAudio.duration; };
 volSlider.oninput = ()=>{ volVal.textContent=volSlider.value; if(audio && !marsAudio) audio.volume=volSlider.value/100; };
-document.getElementById("marsVolSlider").oninput = e=>{
-  document.getElementById("marsVolVal").textContent = e.target.value;
-  if(marsAudio) marsAudio.volume = e.target.value/100;
-};
-document.getElementById("xfade").oninput = e=> document.getElementById("xfadeVal").textContent=e.target.value+"s";
+document.getElementById("marsVolSlider").oninput = e=>{ document.getElementById("marsVolVal").textContent=e.target.value; if(marsAudio) marsAudio.volume=e.target.value/100; };
 
 document.getElementById("btnPlay").onclick = togglePlay;
-document.getElementById("btnPause").onclick = ()=>{ if(audio){audio.pause(); isPlaying=false; statusEl.textContent="Pauză";} };
+document.getElementById("btnPause").onclick = ()=>{ if(audio){audio.pause();isPlaying=false;statusEl.textContent="Pauză";} };
 document.getElementById("btnStop").onclick = stopAll;
-document.getElementById("btnNext").onclick = nextTrack;
+document.getElementById("btnNext").onclick = ()=>{ if(currentTrack < playlists[currentPl].tracks.length-1) playTrack(currentTrack+1); };
 document.getElementById("btnAddFile").onclick = ()=> document.getElementById("fileIn").click();
 document.getElementById("btnAddFolder").onclick = ()=> document.getElementById("folderIn").click();
 document.getElementById("fileIn").onchange = e=> [...e.target.files].forEach(addTrack);
@@ -547,8 +348,11 @@ document.getElementById("btnMarsFile").onclick = ()=> document.getElementById("m
 document.getElementById("marsIn").onchange = e=>{ const f=e.target.files[0]; if(f) saveMars(f,f.name); };
 document.getElementById("btnPlayMars").onclick = ()=> playMars(true);
 document.getElementById("btnStopMars").onclick = stopMarsManual;
-document.getElementById("btnNewPl").onclick = ()=>{ const n=prompt("Nume playlist","Playlist nou"); if(n){ playlists.push({id:Date.now(),name:n,tracks:[]}); renderPlaylists(); savePlaylist(); } };
-document.getElementById("btnSettings").onclick = ()=> document.getElementById("settings").style.display="flex";
+document.getElementById("btnNewPl").onclick = ()=>{ const n=prompt("Nume playlist","Nou"); if(n){ playlists.push({id:Date.now(),name:n,tracks:[]}); renderPlaylists(); savePlaylist(); } };
+
+document.addEventListener("keydown", e=>{
+  if(e.code==="Space"){ e.preventDefault(); if(marsAudio && !marsAudio.paused) stopMarsManual(); else togglePlay(); }
+});
 
 init();
 </script>
