@@ -61,6 +61,7 @@ input[type=range]{accent-color:#ffd700;}
   <input id="djName" placeholder="DJ" style="padding:4px;background:#161a22;border:1px solid #333;color:#fff;width:100px;" onchange="localStorage.setItem('djName',this.value)">
   <button onclick="document.getElementById('fileIn').click()">+ File</button>
   <button onclick="document.getElementById('folderIn').click()">+ Folder</button>
+  <button onclick="newPL()" style="background:#3498db;">+ Playlist</button>
   <button onclick="savePL()">Salvează</button>
   <span id="status" style="margin-left:auto;">Gata</span>
 </div>
@@ -104,7 +105,17 @@ let PLS=JSON.parse(localStorage.getItem("djPL")||'[{"n":"Main","t":[]}]');
 let curPL=0, curT=-1, audio=null, marsA=null, playing=false, wasPlaying=false, lastFam="", marsUrl=null;
 const status=document.getElementById("status");
 
-function savePL(){ localStorage.setItem("djPL",JSON.stringify(PLS)); status.textContent="Salvat"; }
+function newPL(){
+  const n = prompt("Nume playlist nou", "Playlist " + (PLS.length+1));
+  if(n && n.trim()){
+    PLS.push({n: n.trim(), t:[]});
+    curPL = PLS.length - 1;
+    renderPL();
+    renderT();
+    savePL();
+    status.textContent = "Playlist: " + n;
+  }
+}
 function renderPL(){
   const el=document.getElementById("pls"); el.innerHTML="";
   PLS.forEach((p,i)=>{
@@ -120,8 +131,20 @@ function renderT(){
   (PLS[curPL].t||[]).forEach((t,i)=>{
     const d=document.createElement("div");
     d.className="track"+(i===curT?" on":"");
-    d.innerHTML=`<span style="flex:1">${t.n}</span><span style="color:#888">${t.d||""}</span>`;
+    d.draggable=true;
+    d.innerHTML=`<span style="flex:1">${t.n}</span><span style="color:#888">${t.d||""}</span><span style="color:#e74c3c;cursor:pointer;margin-left:8px;" onclick="event.stopPropagation();PLS[curPL].t.splice(${i},1);renderT();savePL();">✕</span>`;
     d.ondblclick=()=>playT(i);
+    d.ondragstart=e=>{ e.dataTransfer.setData("text/plain",i); };
+    d.ondragover=e=>e.preventDefault();
+    d.ondrop=e=>{
+      e.preventDefault();
+      const from=parseInt(e.dataTransfer.getData("text/plain"));
+      if(from===i||isNaN(from)) return;
+      const arr=PLS[curPL].t;
+      const [m]=arr.splice(from,1);
+      arr.splice(i,0,m);
+      renderT(); savePL();
+    };
     el.appendChild(d);
   });
 }
