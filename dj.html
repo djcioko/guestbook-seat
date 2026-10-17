@@ -260,13 +260,17 @@ function renderTracks(){
   });
 }
 function addTrack(file){
+  if(!file) return;
   const url = URL.createObjectURL(file);
   const a = new Audio(url);
   a.onloadedmetadata = ()=>{
+    if(!playlists[currentPl]) return;
     playlists[currentPl].tracks.push({name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""});
     renderTracks();
     savePlaylist();
+    statusEl.textContent = "Adăugat: " + file.name;
   };
+  a.onerror = ()=>{ statusEl.textContent = "Eroare: " + file.name; };
 }
 function playTrack(i){
   currentTrack = i;
@@ -377,10 +381,9 @@ document.getElementById("btnStop").onclick = stopAll;
 document.getElementById("btnNext").onclick = ()=>{ if(currentTrack < playlists[currentPl].tracks.length-1) playTrack(currentTrack+1); };
 document.getElementById("btnAddFile").onclick = ()=> document.getElementById("fileIn").click();
 document.getElementById("btnAddFolder").onclick = ()=> document.getElementById("folderIn").click();
-document.getElementById("fileIn").onchange = e=> [...e.target.files].forEach(addTrack);
-document.getElementById("folderIn").onchange = e=> [...e.target.files].forEach(addTrack);
-document.getElementById("btnMarsFile").onclick = ()=> document.getElementById("marsIn").click();
-document.getElementById("marsIn").onchange = e=>{ const f=e.target.files[0]; if(f) saveMars(f,f.name); };
+document.getElementById("fileIn").onchange = e => { [...e.target.files].forEach(addTrack); e.target.value=""; };
+document.getElementById("folderIn").onchange = e => { [...e.target.files].forEach(addTrack); e.target.value=""; };
+document.getElementById("marsIn").onchange = e => { const f=e.target.files[0]; if(f){ saveMars(f,f.name); statusEl.textContent="Marș: "+f.name; } e.target.value=""; };
 document.getElementById("btnPlayMars").onclick = ()=> playMars(true);
 document.getElementById("btnStopMars").onclick = stopMarsManual;
 document.getElementById("btnNewPl").onclick = ()=>{ const n=prompt("Nume playlist","Nou"); if(n){ playlists.push({id:Date.now(),name:n,tracks:[]}); renderPlaylists(); savePlaylist(); } };
