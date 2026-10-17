@@ -6,61 +6,149 @@
 <title>DJ Monitor</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
-body{background:#0a0e14;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.card{background:#121820;border:1px solid #ffd700;border-radius:16px;padding:28px;width:100%;max-width:560px;text-align:center;}
-h1{color:#ffd700;font-size:1.6rem;margin-bottom:6px;}
-.sub{color:#aaa;font-size:.9rem;margin-bottom:14px;}
-.family{background:#0d1117;border:2px solid #00ffcc;border-radius:12px;padding:18px;margin-bottom:16px;min-height:100px;display:flex;flex-direction:column;justify-content:center;}
-.family-label{font-size:.75rem;color:#aaa;letter-spacing:1px;}
-.family-name{font-size:2.4rem;font-weight:900;color:#ffd700;margin-top:4px;word-break:break-word;}
-.guest-name{font-size:1rem;color:#00ffcc;margin-top:6px;}
-.drop{border:2px dashed #ffd700;border-radius:12px;padding:30px 20px;background:#0d1117;cursor:pointer;transition:.2s;}
-.drop:hover,.drop.drag{background:#1a2230;border-color:#00ffcc;}
-.drop p{font-size:1.05rem;margin-bottom:4px;}
-.drop small{color:#888;}
-input[type=file]{display:none;}
-.controls{display:flex;gap:10px;justify-content:center;margin:16px 0;}
-button{padding:12px 24px;font-size:1.05rem;font-weight:800;border:none;border-radius:10px;cursor:pointer;}
+body{background:#0a0e14;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+.top-section{background:#121820;border-bottom:2px solid #00ffcc;padding:8px 12px;}
+.arrival-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.family-box{flex:1;background:#0d1117;border:1px solid #00ffcc;border-radius:8px;padding:6px 10px;}
+.family-label{font-size:.6rem;color:#aaa;}
+.family-name{font-size:1.6rem;font-weight:900;color:#ffd700;}
+.guest-info{font-size:1rem;color:#3498db;font-weight:700;}
+.mars-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mars-controls button{padding:5px 10px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
+.mars-controls .stop{background:#c0392b;}
+.mars-info{font-size:.85rem;color:#fff;font-weight:700;min-width:180px;background:#1a2230;padding:4px 8px;border-radius:4px;}
+.seek-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
+.seek-row input[type=range]{flex:1;accent-color:#00ffcc;}
+.time-info{font-size:.7rem;color:#aaa;white-space:nowrap;}
+.dj-name-row{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#0d1117;border-bottom:1px solid #333;}
+.dj-name-row input{padding:4px 8px;background:#161a22;border:1px solid #333;color:#fff;border-radius:4px;font-size:.8rem;width:160px;}
+.main{flex:1;display:flex;min-height:0;}
+.left{width:200px;background:#121820;border-right:1px solid #333;display:flex;flex-direction:column;}
+.left h3{padding:6px 8px;font-size:.8rem;color:#ffd700;border-bottom:1px solid #333;}
+.playlists{flex:1;overflow-y:auto;padding:4px;}
+.pl-item{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:.75rem;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;}
+.pl-item:hover,.pl-item.active{background:#1a2230;}
+.pl-item .del{color:#e74c3c;font-size:.7rem;cursor:pointer;}
+.center{flex:1;display:flex;flex-direction:column;min-width:0;}
+.tracks{flex:1;overflow-y:auto;background:#0d1117;}
+.track{display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid #1a1f28;font-size:.75rem;cursor:grab;}
+.track .bpm{width:50px;text-align:right;color:#f39c12;font-size:.7rem;margin-left:8px;}
+.track-wave{height:40px;background:#0a0e14;border-top:1px solid #333;}
+.track:hover{background:#161c26;}
+.track.playing{background:#1a2a1a;color:#2ecc71;}
+.track .dur{margin-left:auto;color:#888;font-size:.7rem;}
+.bottom{height:120px;background:#121820;border-top:1px solid #333;display:flex;flex-direction:column;}
+.wave-wrap{flex:1;}
+canvas{width:100%;height:100%;display:block;}
+.vol-row{display:flex;align-items:center;gap:8px;padding:4px 10px;background:#0d1117;font-size:.7rem;}
+.vol-row label{color:#aaa;width:50px;}
+input[type=range]{accent-color:#ffd700;}
+button{padding:5px 9px;font-size:.75rem;font-weight:700;border:none;border-radius:5px;cursor:pointer;background:#252a35;color:#fff;}
 .play{background:#2ecc71;color:#000;}
-.stop{background:#e74c3c;color:#fff;}
-button:disabled{opacity:.4;cursor:not-allowed;}
-.info{margin-top:8px;font-size:.9rem;color:#00ffcc;min-height:22px;}
-.time{font-size:.8rem;color:#aaa;margin-top:4px;}
-.hint{margin-top:14px;font-size:.75rem;color:#666;}
-.auto{margin-top:10px;font-size:.85rem;}
-.auto label{cursor:pointer;}
+.stop{background:#e74c3c;}
+.pause{background:#f39c12;color:#000;}
+.next{background:#3498db;}
+.hint{font-size:.65rem;color:#666;padding:2px 8px;}
+.settings{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;}
+.settings .box{background:#161a22;border:1px solid #ffd700;border-radius:10px;padding:16px;width:90%;max-width:420px;}
+.fg{margin-bottom:8px;}
+.fg label{display:block;font-size:.7rem;color:#aaa;margin-bottom:2px;}
+.fg input{width:100%;padding:5px;background:#0c0e12;border:1px solid #333;color:#fff;border-radius:4px;}
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>DJ Monitor</h1>
-  <div class="sub">Primește automat de la tabletă</div>
-
-  <div class="family">
-    <div class="family-label">FAMILIA</div>
-    <div class="family-name" id="familyName">—</div>
-    <div class="guest-name" id="guestName"></div>
+<div class="top-section">
+  <div class="arrival-row">
+    <div class="family-box">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="family-label">ULTIMUL SOSIT</div>
+          <div class="family-name" id="familyName">—</div>
+          <div class="guest-info" id="guestName"></div>
+        </div>
+        <div style="text-align:right;font-size:.7rem;line-height:1.3;">
+          <div id="statArrived" style="color:#2ecc71;font-weight:700;">SOSIȚI: 0</div>
+          <div id="statRemaining" style="color:#e74c3c;">RĂMAȘI: 0</div>
+          <div id="statTotal" style="color:#aaa;">TOTAL: 0</div>
+        </div>
+      </div>
+    </div>
+    <div class="mars-controls">
+      <button id="btnMarsFile">+ Marș</button>
+      <span class="mars-info" id="marsInfo">Fără marș</span>
+      <button class="play" id="btnPlayMars">▶ Play Marș</button>
+      <button class="stop" id="btnStopMars">■ Stop Marș</button>
+      <label style="font-size:.7rem;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="autoMars" checked> Auto la sosire</label>
+    </div>
   </div>
-
-  <div class="drop" id="drop">
-    <p>Trage MP3 / WAV / FLAC aici</p>
-    <small>sau click pentru a alege</small>
-    <input type="file" id="file" accept="audio/*">
+  <div class="seek-row">
+    <span class="time-info" id="marsCur">0:00</span>
+    <input type="range" id="marsSeek" min="0" max="100" value="0">
+    <span class="time-info" id="marsTot">0:00</span>
+    <span class="time-info" id="marsLeft">-0:00</span>
   </div>
-
-  <div class="controls">
-    <button class="play" id="btnPlay" disabled>▶ Play</button>
-    <button class="stop" id="btnStop" disabled>■ Stop</button>
-  </div>
-
-  <div class="auto">
-    <label><input type="checkbox" id="autoPlay"> Pornește melodia automat la sosire</label>
-  </div>
-
-  <div class="info" id="info">Nicio melodie încărcată</div>
-  <div class="time" id="time"></div>
-  <div class="hint">Space = Stop &nbsp;|&nbsp; Max 60 sec</div>
 </div>
+
+<div class="dj-name-row">
+  <span style="font-size:.75rem;color:#aaa;">DJ:</span>
+  <input id="djName" placeholder="Nume DJ" onchange="saveDjName()">
+  <button onclick="savePlaylist()">Salvează Playlist</button>
+  <button onclick="document.getElementById('btnNewPl').click()">+ Playlist</button>
+  <button id="btnSettings">⚙</button>
+  <span style="margin-left:auto;font-size:.7rem;color:#aaa;" id="status">Gata</span>
+</div>
+
+<div class="main">
+  <div class="left">
+    <h3>Playlists</h3>
+    <div class="playlists" id="playlists"></div>
+  </div>
+  <div class="center">
+    <div style="display:flex;gap:6px;padding:6px;background:#121820;">
+      <button class="play" id="btnPlay">▶</button>
+      <button class="pause" id="btnPause">⏸</button>
+      <button class="stop" id="btnStop">■</button>
+      <button class="next" id="btnNext">⏭</button>
+      <button id="btnAddFile">+ File</button>
+      <button id="btnAddFolder">+ Folder</button>
+    </div>
+    <div class="tracks" id="tracks"></div>
+    <div class="track-wave"><canvas id="trackWave"></canvas></div>
+    <div class="hint">Click = select &nbsp;|&nbsp; Double-click = play &nbsp;|&nbsp; Drag pentru reordonare &nbsp;|&nbsp; BPM click pentru sortare</div>
+  </div>
+</div>
+
+<div class="bottom">
+  <div class="wave-wrap"><canvas id="wave"></canvas></div>
+  <div class="vol-row">
+    <label>Volum</label>
+    <input type="range" id="vol" min="0" max="100" value="80" style="width:120px;">
+    <span id="volVal">80</span>
+    <label style="width:70px;">Crossfade</label>
+    <input type="range" id="xfade" min="1" max="10" value="3" style="width:80px;">
+    <span id="xfadeVal">3s</span>
+  </div>
+</div>
+
+<div class="settings" id="settings">
+  <div class="box">
+    <h3 style="color:#ffd700;margin-bottom:10px;">Setări</h3>
+    <div class="fg"><label>Tastă Play/Pause</label><input id="keyPlay" value="Space"></div>
+    <div class="fg"><label>Tastă Next</label><input id="keyNext" value="ArrowRight"></div>
+    <div class="fg"><label>Tastă Stop</label><input id="keyStop" value="Escape"></div>
+    <div class="fg"><label>Tastă Stop Marș</label><input id="keyStopMars" value="KeyM"></div>
+    <div class="fg"><label>Volum marș</label><input type="number" id="marsVol" value="90" min="0" max="100"></div>
+    <div style="display:flex;gap:6px;margin-top:10px;">
+      <button onclick="saveSettings()" style="background:#2ecc71;color:#000;">Salvează</button>
+      <button onclick="document.getElementById('settings').style.display='none'">Închide</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="marsIn" accept="audio/*" style="display:none">
+<input type="file" id="fileIn" multiple accept="audio/*" style="display:none">
+<input type="file" id="folderIn" webkitdirectory multiple style="display:none">
+<button id="btnNewPl" style="display:none;">+ Playlist</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -77,79 +165,359 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const drop = document.getElementById('drop');
-const fileInput = document.getElementById('file');
-const btnPlay = document.getElementById('btnPlay');
-const btnStop = document.getElementById('btnStop');
-const info = document.getElementById('info');
-const timeEl = document.getElementById('time');
-const familyName = document.getElementById('familyName');
-const guestName = document.getElementById('guestName');
-const autoPlay = document.getElementById('autoPlay');
-
+let playlists = JSON.parse(localStorage.getItem("djPlaylists")||'[{"id":1,"name":"Main","tracks":[]}]');
+let currentPl = 0;
+let currentTrack = -1;
 let audio = null;
-let timer = null;
-const MAX_SEC = 60;
+let marsAudio = null;
+let isPlaying = false;
+let wasPlayingBeforeMars = false;
+let savedVolume = 80;
+let marsUrl = null;
+let audioCtx, analyser, sourceNode;
+const canvas = document.getElementById("wave");
+const ctx = canvas.getContext("2d");
 
-drop.onclick = () => fileInput.click();
-drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
-drop.ondragleave = () => drop.classList.remove('drag');
-drop.ondrop = e => {
-  e.preventDefault(); drop.classList.remove('drag');
-  if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
-};
-fileInput.onchange = () => { if (fileInput.files.length) loadFile(fileInput.files[0]); };
+const tracksEl = document.getElementById("tracks");
+const playlistsEl = document.getElementById("playlists");
+const volSlider = document.getElementById("vol");
+const volVal = document.getElementById("volVal");
+const familyName = document.getElementById("familyName");
+const guestName = document.getElementById("guestName");
+const statusEl = document.getElementById("status");
+const marsSeek = document.getElementById("marsSeek");
+const marsCur = document.getElementById("marsCur");
+const marsTot = document.getElementById("marsTot");
+const marsLeft = document.getElementById("marsLeft");
 
-function loadFile(file) {
-  if (audio) { audio.pause(); audio = null; }
-  clearTimeout(timer);
+function init(){
+  document.getElementById("djName").value = localStorage.getItem("djName")||"";
+  renderPlaylists();
+  restoreTracks().then(()=>renderTracks());
+  loadSettings();
+  setupAudio();
+  setupDragDrop();
+  setupKeyboard();
+  listenFirebase();
+  loadMars();
+  requestAnimationFrame(drawWave);
+  setInterval(updateMarsTime, 200);
+}
+function saveDjName(){ localStorage.setItem("djName", document.getElementById("djName").value); }
+function savePlaylist(){
+  localStorage.setItem("djPlaylists", JSON.stringify(playlists));
+  statusEl.textContent = "Playlist salvat";
+}
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open("djMonitor",2);
+    r.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains("files")) db.createObjectStore("files");
+    };
+    r.onsuccess = e => res(e.target.result);
+    r.onerror = () => rej();
+  });
+}
+async function saveMars(blob, name){
+  const dbx = await openDB();
+  const tx = dbx.transaction("files","readwrite");
+  tx.objectStore("files").put({blob, name}, "mars");
+  if(marsUrl) URL.revokeObjectURL(marsUrl);
+  marsUrl = URL.createObjectURL(blob);
+  const a = new Audio(marsUrl);
+  a.onloadedmetadata = () => {
+    document.getElementById("marsInfo").textContent = name;
+    marsTot.textContent = formatTime(a.duration);
+  };
+}
+async function loadMars(){
+  try{
+    const dbx = await openDB();
+    const tx = dbx.transaction("files","readonly");
+    const req = tx.objectStore("files").get("mars");
+    req.onsuccess = () => {
+      if(req.result){
+        marsUrl = URL.createObjectURL(req.result.blob);
+        const a = new Audio(marsUrl);
+        a.onloadedmetadata = () => {
+          document.getElementById("marsInfo").textContent = req.result.name;
+          marsTot.textContent = formatTime(a.duration);
+        };
+      }
+    };
+  }catch(e){}
+}
+function setupAudio(){
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+}
+function setupDragDrop(){
+  const area = document.getElementById("tracks");
+  area.ondragover = e => e.preventDefault();
+  area.ondrop = e => { e.preventDefault(); [...e.dataTransfer.files].forEach(addTrack); };
+}
+function setupKeyboard(){
+  document.addEventListener("keydown", e=>{
+    const s = getSettings();
+    if(e.code === s.keyPlay){ e.preventDefault(); togglePlay(); }
+    if(e.code === s.keyNext){ e.preventDefault(); nextTrack(); }
+    if(e.code === s.keyStop){ e.preventDefault(); stopAll(); }
+    if(e.code === s.keyStopMars){ e.preventDefault(); stopMarsManual(); }
+  });
+}
+function getSettings(){ return JSON.parse(localStorage.getItem("djSettings")||'{"keyPlay":"Space","keyNext":"ArrowRight","keyStop":"Escape","keyStopMars":"KeyM","marsVol":90}'); }
+function saveSettings(){
+  const s = { keyPlay:document.getElementById("keyPlay").value, keyNext:document.getElementById("keyNext").value, keyStop:document.getElementById("keyStop").value, keyStopMars:document.getElementById("keyStopMars").value, marsVol:parseInt(document.getElementById("marsVol").value)||90 };
+  localStorage.setItem("djSettings", JSON.stringify(s));
+  document.getElementById("settings").style.display="none";
+}
+function loadSettings(){
+  const s = getSettings();
+  document.getElementById("keyPlay").value = s.keyPlay;
+  document.getElementById("keyNext").value = s.keyNext;
+  document.getElementById("keyStop").value = s.keyStop;
+  document.getElementById("keyStopMars").value = s.keyStopMars||"KeyM";
+  document.getElementById("marsVol").value = s.marsVol;
+}
+function renderPlaylists(){
+  playlistsEl.innerHTML = "";
+  playlists.forEach((p,i)=>{
+    const d = document.createElement("div");
+    d.className = "pl-item"+(i===currentPl?" active":"");
+    d.innerHTML = `<span>${p.name}</span><span class="del" onclick="event.stopPropagation();deletePl(${i})">✕</span>`;
+    d.onclick = ()=>{ currentPl=i; renderPlaylists(); renderTracks(); };
+    d.ondblclick = ()=>{ const n=prompt("Nume",p.name); if(n){p.name=n; renderPlaylists(); savePlaylist();} };
+    playlistsEl.appendChild(d);
+  });
+}
+function deletePl(i){
+  if(playlists.length<=1) return alert("Trebuie să rămână cel puțin un playlist");
+  if(confirm("Ștergi playlist-ul?")){ playlists.splice(i,1); if(currentPl>=playlists.length) currentPl=0; renderPlaylists(); renderTracks(); savePlaylist(); }
+}
+function renderTracks(){
+  tracksEl.innerHTML = "";
+  const header = document.createElement("div");
+  header.style.cssText = "display:flex;padding:4px 8px;font-size:.7rem;color:#aaa;border-bottom:1px solid #333;background:#161a22;";
+  header.innerHTML = `<span style="flex:1">Piesă</span><span class="bpm" style="cursor:pointer" onclick="sortTracks('bpm')">BPM</span><span class="dur" style="cursor:pointer" onclick="sortTracks('dur')">Timp</span><span style="width:30px"></span>`;
+  tracksEl.appendChild(header);
+  playlists[currentPl].tracks.forEach((t,i)=>{
+    const d = document.createElement("div");
+    d.className = "track"+(i===currentTrack?" playing":"");
+    d.draggable = true;
+    d.innerHTML = `<span style="flex:1">${t.name}</span><span class="bpm">${t.bpm||"--"}</span><span class="dur">${t.dur||"--:--"}</span><span style="color:#e74c3c;cursor:pointer;width:30px;text-align:center;" onclick="event.stopPropagation();deleteTrack(${i})">✕</span>`;
+    d.onclick = ()=> { selectTrack(i); drawTrackWave(t); };
+    d.ondblclick = ()=> playTrack(i);
+    d.ondragstart = e => e.dataTransfer.setData("text/plain", i);
+    d.ondragover = e => e.preventDefault();
+    d.ondrop = e => {
+      e.preventDefault();
+      const from = parseInt(e.dataTransfer.getData("text/plain"));
+      const to = i;
+      if(from===to) return;
+      const arr = playlists[currentPl].tracks;
+      const [moved] = arr.splice(from,1);
+      arr.splice(to,0,moved);
+      renderTracks();
+      savePlaylist();
+    };
+    tracksEl.appendChild(d);
+  });
+}
+function deleteTrack(i){
+  if(confirm("Ștergi piesa?")){
+    playlists[currentPl].tracks.splice(i,1);
+    renderTracks();
+    savePlaylist();
+  }
+}
+function sortTracks(by){
+  const arr = playlists[currentPl].tracks;
+  if(by==="bpm") arr.sort((a,b)=>(parseInt(a.bpm)||999)-(parseInt(b.bpm)||999));
+  if(by==="dur") arr.sort((a,b)=>(a.durSec||0)-(b.durSec||0));
+  renderTracks();
+  savePlaylist();
+}
+function drawTrackWave(t){
+  const c = document.getElementById("trackWave");
+  const cx = c.getContext("2d");
+  c.width = c.offsetWidth; c.height = c.offsetHeight;
+  cx.clearRect(0,0,c.width,c.height);
+  // Simple placeholder waveform bars
+  for(let i=0;i<80;i++){
+    const h = Math.random()*c.height*0.8;
+    cx.fillStyle = `hsl(${i*4},70%,50%)`;
+    cx.fillRect(i*(c.width/80), c.height-h, c.width/80-1, h);
+  }
+}
+async function addTrack(file){
+  const dbx = await openDB();
+  const id = "t_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+  const tx = dbx.transaction("files","readwrite");
+  tx.objectStore("files").put({blob:file, name:file.name}, id);
   const url = URL.createObjectURL(file);
-  audio = new Audio(url);
-  audio.onended = stop;
-  info.textContent = 'Încărcat: ' + file.name;
-  btnPlay.disabled = false;
-  btnStop.disabled = true;
-  timeEl.textContent = '';
+  const a = new Audio(url);
+  a.onloadedmetadata = ()=>{
+    playlists[currentPl].tracks.push({
+      id, name:file.name, url, dur:formatTime(a.duration), durSec:a.duration, bpm:""
+    });
+    renderTracks();
+    savePlaylist();
+  };
 }
-
-function play() {
-  if (!audio) return;
-  audio.currentTime = 0;
+async function restoreTracks(){
+  const dbx = await openDB();
+  const tx = dbx.transaction("files","readonly");
+  const store = tx.objectStore("files");
+  for(const pl of playlists){
+    for(const t of pl.tracks){
+      if(t.id){
+        const req = store.get(t.id);
+        req.onsuccess = ()=>{
+          if(req.result){
+            t.url = URL.createObjectURL(req.result.blob);
+          }
+        };
+      }
+    }
+  }
+}
+function selectTrack(i){ currentTrack=i; renderTracks(); }
+function playTrack(i){
+  currentTrack = i;
+  const t = playlists[currentPl].tracks[i];
+  if(!t) return;
+  stopMarsManual();
+  if(audio) audio.pause();
+  audio = new Audio(t.url);
+  audio.volume = volSlider.value/100;
+  audio.onended = nextTrack;
   audio.play().catch(()=>{});
-  btnPlay.disabled = true;
-  btnStop.disabled = false;
-  clearTimeout(timer);
-  timer = setTimeout(stop, MAX_SEC * 1000);
-  updateTime();
+  isPlaying = true;
+  statusEl.textContent = "Redă: "+t.name;
+  renderTracks();
+  connectWave();
 }
-
-function stop() {
-  if (audio) audio.pause();
-  clearTimeout(timer);
-  btnPlay.disabled = false;
-  btnStop.disabled = true;
-  timeEl.textContent = '';
+function togglePlay(){
+  if(!audio){ if(playlists[currentPl].tracks.length) playTrack(0); return; }
+  if(isPlaying){ audio.pause(); isPlaying=false; statusEl.textContent="Pauză"; }
+  else{ audio.play(); isPlaying=true; statusEl.textContent="Redă"; }
 }
-
-function updateTime() {
-  if (!audio || audio.paused) return;
-  const left = Math.max(0, MAX_SEC - Math.floor(audio.currentTime));
-  timeEl.textContent = 'Rămân ' + left + ' sec';
-  if (!audio.paused) requestAnimationFrame(updateTime);
+function nextTrack(){
+  const pl = playlists[currentPl];
+  if(currentTrack < pl.tracks.length-1) playTrack(currentTrack+1);
+  else stopAll();
 }
+function stopAll(){
+  if(audio){ audio.pause(); audio.currentTime=0; }
+  isPlaying=false;
+  statusEl.textContent="Stop";
+}
+function formatTime(s){ if(!s||!isFinite(s)) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
+function connectWave(){
+  if(!audioCtx || !audio) return;
+  try{
+    if(sourceNode) sourceNode.disconnect();
+    sourceNode = audioCtx.createMediaElementSource(audio);
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }catch(e){}
+}
+function drawWave(){
+  requestAnimationFrame(drawWave);
+  if(!analyser) return;
+  const w = canvas.width = canvas.offsetWidth;
+  const h = canvas.height = canvas.offsetHeight;
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+  ctx.clearRect(0,0,w,h);
+  const barW = w / data.length * 2.5;
+  let x=0;
+  for(let i=0;i<data.length;i++){
+    const barH = (data[i]/255)*h;
+    ctx.fillStyle = `hsl(${(i/data.length)*360},80%,55%)`;
+    ctx.fillRect(x, h-barH, barW-1, barH);
+    x += barW;
+  }
+}
+function listenFirebase(){
+  db.ref("lastArrival").on("value", snap=>{
+    const d = snap.val();
+    if(!d) return;
+    familyName.textContent = d.family ? d.family.toUpperCase() : "—";
+    guestName.innerHTML = `<span style="color:#ffd700">${d.name||""}</span> <span style="color:#e74c3c">${d.table||""}</span>`;
+    playMars();
+  });
+  db.ref("stats").on("value", snap=>{
+    const s = snap.val() || {};
+    document.getElementById("statArrived").textContent = "SOSIȚI: " + (s.arrived||0);
+    document.getElementById("statRemaining").textContent = "RĂMAȘI: " + (s.remaining||0);
+    document.getElementById("statTotal").textContent = "TOTAL: " + (s.total||0);
+  });
+}
+function playMars(){
+  if(!document.getElementById("autoMars").checked && !arguments[0]) return;
+  wasPlayingBeforeMars = isPlaying;
+  savedVolume = volSlider.value;
+  if(audio && isPlaying){ audio.pause(); isPlaying=false; }
+  if(!marsUrl){ statusEl.textContent="Fără marș"; setTimeout(resumePlaylist,500); return; }
+  if(marsAudio) marsAudio.pause();
+  marsAudio = new Audio(marsUrl);
+  marsAudio.volume = (getSettings().marsVol||90)/100;
+  marsAudio.onended = ()=>{ marsAudio=null; resumePlaylist(); };
+  marsAudio.play().catch(()=>{});
+  statusEl.textContent = "Marș...";
+}
+function stopMarsManual(){
+  if(marsAudio){ marsAudio.pause(); marsAudio=null; }
+  statusEl.textContent = "Marș oprit";
+  resumePlaylist();
+}
+function resumePlaylist(){
+  if(wasPlayingBeforeMars && audio){
+    audio.volume = 0;
+    audio.play().catch(()=>{});
+    isPlaying = true;
+    fadeUp();
+  }
+}
+function fadeUp(){
+  let v=0; const target=savedVolume/100; const step=target/25;
+  const iv=setInterval(()=>{
+    v+=step; if(v>=target){v=target; clearInterval(iv);}
+    if(audio) audio.volume=v;
+    volSlider.value=Math.round(v*100); volVal.textContent=volSlider.value;
+  },40);
+}
+function updateMarsTime(){
+  if(!marsAudio || marsAudio.paused) return;
+  const c=marsAudio.currentTime, d=marsAudio.duration||0;
+  marsCur.textContent = formatTime(c);
+  marsTot.textContent = formatTime(d);
+  marsLeft.textContent = "-"+formatTime(d-c);
+  if(d) marsSeek.value = (c/d)*100;
+}
+marsSeek.oninput = ()=>{ if(marsAudio && marsAudio.duration) marsAudio.currentTime = (marsSeek.value/100)*marsAudio.duration; };
+volSlider.oninput = ()=>{ volVal.textContent=volSlider.value; if(audio && !marsAudio) audio.volume=volSlider.value/100; };
+document.getElementById("xfade").oninput = e=> document.getElementById("xfadeVal").textContent=e.target.value+"s";
 
-btnPlay.onclick = play;
-btnStop.onclick = stop;
-document.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); stop(); } });
+document.getElementById("btnPlay").onclick = togglePlay;
+document.getElementById("btnPause").onclick = ()=>{ if(audio){audio.pause(); isPlaying=false; statusEl.textContent="Pauză";} };
+document.getElementById("btnStop").onclick = stopAll;
+document.getElementById("btnNext").onclick = nextTrack;
+document.getElementById("btnAddFile").onclick = ()=> document.getElementById("fileIn").click();
+document.getElementById("btnAddFolder").onclick = ()=> document.getElementById("folderIn").click();
+document.getElementById("fileIn").onchange = e=> [...e.target.files].forEach(addTrack);
+document.getElementById("folderIn").onchange = e=> [...e.target.files].forEach(addTrack);
+document.getElementById("btnMarsFile").onclick = ()=> document.getElementById("marsIn").click();
+document.getElementById("marsIn").onchange = e=>{ const f=e.target.files[0]; if(f) saveMars(f,f.name); };
+document.getElementById("btnPlayMars").onclick = ()=> playMars(true);
+document.getElementById("btnStopMars").onclick = stopMarsManual;
+document.getElementById("btnNewPl").onclick = ()=>{ const n=prompt("Nume playlist","Playlist nou"); if(n){ playlists.push({id:Date.now(),name:n,tracks:[]}); renderPlaylists(); savePlaylist(); } };
+document.getElementById("btnSettings").onclick = ()=> document.getElementById("settings").style.display="flex";
 
-// Primește de la tabletă
-db.ref("lastArrival").on("value", snap => {
-  const d = snap.val();
-  if (!d) return;
-  familyName.textContent = d.family ? d.family.toUpperCase() : "—";
-  guestName.textContent = d.name || "";
-  if (autoPlay.checked && audio) play();
-});
+init();
 </script>
 </body>
 </html>
